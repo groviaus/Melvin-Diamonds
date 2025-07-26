@@ -50,14 +50,14 @@ export default function Header() {
                   alt="Mevlin Diamonds"
                   width={150}
                   height={150}
-                  className="w-10 h-10 sm:w-12 sm:h-12 lg:w-20 lg:h-20 object-contain"
+                  className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 object-contain"
                 />
                 <Image
                   src="/images/logoText.png"
                   alt="Mevlin Diamonds"
                   width={150}
                   height={150}
-                  className="w-auto h-6 sm:w-12 sm:h-12 lg:w-auto lg:h-10 object-contain sm:mt-2"
+                  className="w-auto h-6 sm:w-12 sm:h-12 lg:w-auto lg:h-8 object-contain sm:mt-2"
                 />
                   {/* <h1 className="text-lg sm:text-xl lg:text-3xl font-light tracking-[0.1em] sm:tracking-[0.15em] lg:tracking-[0.2em] text-gray-800 mb-1">
                     MEVLIN DIAMONDS<sup className="text-xs">®</sup>
