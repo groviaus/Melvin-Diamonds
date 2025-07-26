@@ -52,19 +52,19 @@ export default function Categories() {
   ];
 
   return (
-    <section className="py-16 sm:px-8 px-4  mx-auto">
+    <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 mx-auto">
       {/* Header Section */}
-      <div className="text-left mb-12">
-        <h1 className="text-4xl font-serif text-gray-800 mb-4">
+      <div className="sm:text-left text-center mb-8 sm:mb-10 lg:mb-12">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-gray-800 mb-2 sm:mb-3 lg:mb-4">
           Shop Jewelry by Category
         </h1>
-        <p className="text-lg font-light text-gray-600 max-w-2xl">
+        <p className="text-base sm:text-lg font-light text-gray-600 max-w-2xl">
           Thoughtfully designed collections for the big day and every day.
         </p>
       </div>
 
       {/* Categories Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
         {categories.map((category, index) => (
           <CategoryCard key={index} category={category} />
         ))}
@@ -84,7 +84,7 @@ function CategoryCard({ category }: { category: Category }) {
     >
       {/* Product Image Container */}
       <div
-        className={`aspect-[4/5] ${category.bgColor} mb-4 flex items-center justify-center overflow-hidden shadow-sm relative `}
+        className={`aspect-[4/5] ${category.bgColor} mb-2 sm:mb-3 lg:mb-4 flex items-center justify-center overflow-hidden shadow-sm relative`}
       >
         {/* Main image */}
         <Image
@@ -92,7 +92,7 @@ function CategoryCard({ category }: { category: Category }) {
           alt={category.name}
           fill
           className="object-cover object-center"
-          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 16vw, 16vw"
           draggable={false}
         />
 
@@ -108,14 +108,14 @@ function CategoryCard({ category }: { category: Category }) {
             alt={category.name + " alternate"}
             fill
             className="object-cover object-center"
-            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 16vw, 16vw"
             draggable={false}
           />
         </motion.div>
       </div>
 
       {/* Category Label */}
-      <h3 className="text-center font-light text-gray-900 sm:text-lg text-base">
+      <h3 className="text-center font-light text-gray-900 text-xs sm:text-sm lg:text-lg mb-4 sm:mb-0">
         {category.name}
       </h3>
     </motion.div>

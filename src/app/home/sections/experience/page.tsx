@@ -55,9 +55,9 @@ export default function Experience() {
   };
 
   return (
-    <div className="grid grid-cols-2 h-[700px]">
+    <div className="grid grid-cols-1 lg:grid-cols-2 h-max sm:min-h-[500px] lg:h-[700px]">
       {/* Left Section - Background Image with Overlay */}
-      <div className="py-16 pl-8 h-full">
+      <div className="py-6 sm:py-8 lg:py-16 px-4 sm:px-6 lg:pl-8 h-80 sm:h-full">
         <div className="relative h-full">
           {/* Background Image */}
           <div
@@ -73,12 +73,12 @@ export default function Experience() {
       </div>
 
       {/* Right Section - Heading and Product Grid */}
-      <div className="flex-1 p-12 h-full">
+      <div className="flex-1 p-4 sm:p-6 lg:p-12 h-full">
         {/* Main Heading */}
-        <h1 className=" font-serif text-gray-800 mb-5 text-center">
-          <span className="text-2xl">10 </span>YEARS OF OUR MISSION
+        <h1 className="font-serif text-gray-800 mb-3 sm:mb-4 lg:mb-5 text-center">
+          <span className="text-xl sm:text-2xl">10 </span>YEARS OF OUR MISSION
         </h1>
-        <p className="text-gray-800 tracking-wide mb-10 text-2xl text-center">
+        <p className="text-gray-800 tracking-wide mb-6 sm:mb-8 lg:mb-10 text-base sm:text-lg lg:text-2xl text-center">
           From our pioneering diamond standards to our unmatched transparency,
           we&apos;re redefining what it means to design, craft, and experience
           jewelry that makes a real difference.
@@ -87,22 +87,22 @@ export default function Experience() {
         {/* Product Grid - 2x2 */}
         <div className="relative overflow-hidden">
           <div
-            className="flex gap-6 transition-transform duration-300 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * (240 + 24)}px)` }}
+            className="flex gap-3 sm:gap-4 lg:gap-6 transition-transform duration-300 ease-in-out"
+            style={{ transform: `translateX(-${currentIndex * (200 + 16)}px)` }}
           >
             {[...ringCategories, ...ringCategories, ...ringCategories].map(
               (category, index) => (
                 <div key={index} className="flex flex-col flex-shrink-0">
-                  <div className="aspect-[3/4] mb-3 flex items-center justify-center overflow-hidden">
+                  <div className="aspect-[3/4] mb-2 sm:mb-3 flex items-center justify-center overflow-hidden">
                     <Image
                       src={category.image}
                       alt={category.name}
                       width={200}
                       height={200}
-                      className="object-cover w-60 hover:scale-105 transition-all duration-300 h-full"
+                      className="object-cover w-56 sm:w-56 lg:w-60 hover:scale-105 transition-all duration-300 h-full"
                     />
                   </div>
-                  <h3 className="text-left ml-1 text-gray-900 font-medium">
+                  <h3 className="text-left ml-1 text-gray-900 font-medium text-xs sm:text-sm lg:text-base">
                     {category.name}
                   </h3>
                 </div>
@@ -113,10 +113,10 @@ export default function Experience() {
           {/* Navigation Button */}
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white border border-gray-200 rounded-full p-3 shadow-lg transition-all duration-200 hover:shadow-xl"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white border border-gray-200 rounded-full p-2 sm:p-3 shadow-lg transition-all duration-200 hover:shadow-xl"
           >
             <svg
-              className="w-5 h-5 text-gray-700"
+              className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

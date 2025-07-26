@@ -25,41 +25,38 @@ export default function Benefits() {
   ];
 
   return (
-    <section className="bg-teal-950 py-16 px-8">
+    <section className="bg-teal-950 py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Main Heading */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-serif text-white mb-8">
+        <div className="text-center mb-8 sm:mb-10 lg:mb-12">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-white mb-4 sm:mb-6 lg:mb-8">
             We&apos;ve Got You Covered
           </h2>
         </div>
 
         {/* Benefits Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
           {benefits.map((benefit, index) => (
             <div key={index} className="flex flex-col items-center text-center">
               {/* Icon Container with 3D Effect */}
-              <div className="relative mb-4">
+              <div className="relative mb-3 sm:mb-4">
                 {/* 3D Circle Background */}
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-white/20 to-white/5 border border-white/30 shadow-lg backdrop-blur-sm flex items-center justify-center hover:scale-110 hover:rotate-[360deg] transition-all duration-300">
+                <div className="w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white/20 to-white/5 border border-white/30 shadow-lg backdrop-blur-sm flex items-center justify-center hover:scale-110 hover:rotate-[360deg] transition-all duration-300">
                   {/* Icon */}
-                  <div className="w-12 h-12 relative">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 relative">
                     <Image
                       src={benefit.icon}
                       alt={benefit.text}
                       fill
-                      className="object-contain "
-                      sizes="48px"
+                      className="object-contain"
+                      sizes="(max-width: 640px) 40px, (max-width: 768px) 44px, 48px"
                     />
                   </div>
                 </div>
-
-                {/* Subtle Glow Effect */}
-                {/* <div className="absolute inset-0 w-20 h-20 rounded-full bg-gradient-to-br from-white/10 to-transparent blur-sm" /> */}
               </div>
 
               {/* Text Label */}
-              <p className="text-white text-sm font-medium tracking-wide uppercase">
+              <p className="text-white text-xs sm:text-sm font-medium tracking-wide uppercase">
                 {benefit.text}
               </p>
             </div>

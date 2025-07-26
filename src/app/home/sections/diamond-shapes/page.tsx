@@ -26,51 +26,45 @@ export default function DiamondShapes() {
   ];
 
   return (
-    <section className="py-16 bg-[#F9F9F9]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Header Section */}
-       
-
+    <section className="py-8 sm:py-12 lg:py-16 bg-[#F9F9F9]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-5">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-4 sm:gap-5">
           {/* Left - Main Diamond Display */}
           <div className="flex flex-col justify-center items-center sm:items-start">
-          <h2 className="text-3xl text-gray-800 text-center ml-8 mb-4">
-            Shop Diamonds by Shape
-          </h2>
-            <div className="relative w-[25rem] h-60 ">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl text-gray-800 text-center sm:text-left mb-3 sm:mb-4">
+              Shop Diamonds by Shape
+            </h2>
+            <div className="relative w-full sm:w-[20rem] lg:w-[25rem] h-48 sm:h-56 lg:h-60">
               <Image
                 src="/images/rings/mainLeftRing.webp"
                 alt="Featured diamond shape"
                 fill
                 className="object-contain object-left"
-                sizes="(max-width: 768px) 100vw, 320px"
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 320px, 400px"
               />
             </div>
-            {/* <h3 className="text-xl font-light text-gray-800 text-center">
-              {selectedShape} Diamond
-            </h3> */}
           </div>
 
           {/* Right - Shape Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-5  gap-6 sm:gap-10 w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 sm:gap-10 w-full">
             {diamondShapes.map((shape, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedShape(shape.name)}
-                className={`group flex flex-col items-center transition-all duration-300 `}
+                className={`group flex flex-col items-center transition-all duration-300`}
               >
-                <div className="relative w-20 h-20 mb-3 transition-all duration-300">
+                <div className="relative w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 mb-2 sm:mb-3 transition-all duration-300">
                   <Image
                     src={shape.image}
                     alt={shape.name}
                     fill
                     className="object-contain mix-blend-multiply"
-                    sizes="80px"
+                    sizes="(max-width: 640px) 64px, (max-width: 768px) 72px, 80px"
                   />
                 </div>
                 <p
-                  className={`text-center  text-sm font-light transition-colors duration-300 ${
+                  className={`text-center text-xs sm:text-sm font-light transition-colors duration-300 ${
                     selectedShape === shape.name
                       ? "text-teal-700 font-medium"
                       : "text-gray-600 group-hover:text-gray-800"
