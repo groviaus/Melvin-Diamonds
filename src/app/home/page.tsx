@@ -6,6 +6,9 @@ import BestSellers from "./sections/best-sellers/page";
 import RingShowcase from "./sections/ring-showcase/page";
 import Collections from "./sections/collections/page";
 import About from "./sections/about/page";
+import Benefits from "./sections/benefits/page";
+import Experience from "./sections/experience/page";
+import Footer from "./sections/footer/page";
 
 export default function JewelryHomepage() {
   return (
@@ -18,6 +21,9 @@ export default function JewelryHomepage() {
       <RingShowcase />
       <Collections />
       <About />
+      <Benefits />
+      <Experience />
+      <Footer />
     </div>
   );
 }

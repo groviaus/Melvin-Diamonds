@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 
 const page = () => {
-  const collections = [
+  const collections =  [
     {
       title: "Signature Collections",
       description: "The ultimate line in luxury inspired pieces",
