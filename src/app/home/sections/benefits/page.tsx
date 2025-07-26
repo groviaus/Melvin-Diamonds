@@ -30,7 +30,7 @@ export default function Benefits() {
         {/* Main Heading */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-serif text-white mb-8">
-            We've Got You Covered
+            We&apos;ve Got You Covered
           </h2>
         </div>
 
