@@ -13,7 +13,7 @@ import Footer from "./sections/footer/page";
 export default function JewelryHomepage() {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      {/* <Header /> */}
       <Hero />
       <Categories />
       <DiamondShapes />
@@ -23,7 +23,7 @@ export default function JewelryHomepage() {
       <About />
       <Benefits />
       <Experience />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
