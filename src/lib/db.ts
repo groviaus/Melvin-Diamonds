@@ -11,9 +11,24 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+async function getJsonColumnType(
+  connection: mysql.PoolConnection
+): Promise<"JSON" | "TEXT"> {
+  try {
+    await connection.execute(
+      `CREATE TABLE IF NOT EXISTS __json_check (val JSON)`
+    );
+    await connection.execute(`DROP TABLE IF EXISTS __json_check`);
+    return "JSON";
+  } catch {
+    return "TEXT";
+  }
+}
+
 async function createTables() {
   const connection = await pool.getConnection();
   try {
+    const jsonType = await getJsonColumnType(connection);
     console.log("Checking for 'products' table...");
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS products (
@@ -21,11 +36,11 @@ async function createTables() {
         title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         price DECIMAL(10, 2) NOT NULL,
-        mainImage VARCHAR(255) NOT NULL,
-        galleryImages JSON NOT NULL,
-        ringSizes JSON NOT NULL,
-        categories JSON NOT NULL,
-        tags JSON NOT NULL,
+        mainImage VARCHAR(512) NOT NULL,
+        galleryImages ${jsonType} NOT NULL,
+        ringSizes ${jsonType} NOT NULL,
+        categories ${jsonType} NOT NULL,
+        tags ${jsonType} NOT NULL,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
@@ -55,6 +70,3 @@ async function createTables() {
 createTables();
 
 export default pool;
-
-
-

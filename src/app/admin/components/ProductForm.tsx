@@ -366,6 +366,7 @@ export default function ProductForm({
                     width={800}
                     height={320}
                     className="w-full h-32 object-cover rounded-lg mx-auto"
+                    unoptimized
                   />
                   <Button
                     type="button"
@@ -450,6 +451,7 @@ export default function ProductForm({
                         width={400}
                         height={96}
                         className="w-full h-24 object-cover rounded-lg"
+                        unoptimized
                       />
                       <Button
                         type="button"
