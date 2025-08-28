@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -14,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { XIcon, UploadIcon, PlusIcon, Loader2Icon } from "lucide-react";
 import { productAPI, uploadAPI } from "@/lib/api";
-import { Product } from "@/app/api/products/route";
+import { Product } from "@/types";
 
 interface ProductFormData {
   title: string;
@@ -359,9 +360,11 @@ export default function ProductForm({
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
               {formData.mainImageUrl ? (
                 <div className="space-y-2">
-                  <img
+                  <Image
                     src={formData.mainImageUrl}
                     alt="Main product"
+                    width={800}
+                    height={320}
                     className="w-full h-32 object-cover rounded-lg mx-auto"
                   />
                   <Button
@@ -441,9 +444,11 @@ export default function ProductForm({
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   {formData.galleryImageUrls.map((imageUrl, index) => (
                     <div key={index} className="relative">
-                      <img
+                      <Image
                         src={imageUrl}
                         alt={`Gallery ${index + 1}`}
+                        width={400}
+                        height={96}
                         className="w-full h-24 object-cover rounded-lg"
                       />
                       <Button

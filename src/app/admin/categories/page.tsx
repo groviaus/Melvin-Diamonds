@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -14,13 +14,12 @@ import {
   FolderIcon,
   SearchIcon,
   DownloadIcon,
-  UploadIcon,
   Loader2Icon,
 } from "lucide-react";
 import CategoryTree from "../components/CategoryTree";
 import CategoryForm from "../components/CategoryForm";
 import { categoryAPI } from "@/lib/api";
-import { CategoryData, Category } from "@/app/api/categories/route";
+import { CategoryData, Category, Subcategory } from "@/types";
 
 export default function CategoriesPage() {
   const [categoryData, setCategoryData] = useState<CategoryData>({
@@ -36,6 +35,32 @@ export default function CategoriesPage() {
     fetchCategories();
   }, []);
 
+  // Filter helpers (stable)
+  const filterCategoriesBySearch = useCallback(
+    (categories: Category[], term: string): Category[] => {
+      const filterSubcategoriesBySearch = (
+        subcategory: Subcategory,
+        t: string
+      ): boolean => {
+        const matchesName = subcategory.name.toLowerCase().includes(t);
+        const hasMatchingChild =
+          subcategory.subcategories?.some((sub) =>
+            filterSubcategoriesBySearch(sub, t)
+          ) || false;
+        return matchesName || hasMatchingChild;
+      };
+
+      return categories.filter((category) => {
+        const matchesName = category.name.toLowerCase().includes(term);
+        const hasMatchingSubcategory = category.subcategories.some((sub) =>
+          filterSubcategoriesBySearch(sub, term)
+        );
+        return matchesName || hasMatchingSubcategory;
+      });
+    },
+    []
+  );
+
   // Filter categories based on search term
   useEffect(() => {
     if (searchTerm.trim() === "") {
@@ -47,7 +72,7 @@ export default function CategoriesPage() {
       );
       setFilteredCategories(filtered);
     }
-  }, [searchTerm, categoryData]);
+  }, [searchTerm, categoryData, filterCategoriesBySearch]);
 
   const fetchCategories = async () => {
     try {
@@ -62,30 +87,7 @@ export default function CategoriesPage() {
     }
   };
 
-  const filterCategoriesBySearch = (
-    categories: Category[],
-    term: string
-  ): Category[] => {
-    return categories.filter((category) => {
-      const matchesName = category.name.toLowerCase().includes(term);
-      const hasMatchingSubcategory = category.subcategories.some((sub) =>
-        filterSubcategoriesBySearch(sub, term)
-      );
-      return matchesName || hasMatchingSubcategory;
-    });
-  };
-
-  const filterSubcategoriesBySearch = (
-    subcategory: any,
-    term: string
-  ): boolean => {
-    const matchesName = subcategory.name.toLowerCase().includes(term);
-    const hasMatchingChild =
-      subcategory.subcategories?.some((sub: any) =>
-        filterSubcategoriesBySearch(sub, term)
-      ) || false;
-    return matchesName || hasMatchingChild;
-  };
+  // (old inline filter helpers removed; now using memoized version above)
 
   const handleAddCategory = async (name: string, parentId?: string) => {
     try {
@@ -132,6 +134,12 @@ export default function CategoriesPage() {
     }
   };
 
+  const handleAddCategoryFromTree = async (parentId?: string) => {
+    const name = prompt("Enter category name");
+    if (!name || !name.trim()) return;
+    await handleAddCategory(name.trim(), parentId);
+  };
+
   const handleExportCategories = () => {
     const dataStr = JSON.stringify(categoryData, null, 2);
     const dataBlob = new Blob([dataStr], { type: "application/json" });
@@ -151,7 +159,7 @@ export default function CategoriesPage() {
     return count;
   };
 
-  const getSubcategoryCount = (subcategories: any[]): number => {
+  const getSubcategoryCount = (subcategories: Subcategory[]): number => {
     let count = subcategories.length;
     for (const subcategory of subcategories) {
       if (subcategory.subcategories) {
@@ -265,7 +273,7 @@ export default function CategoriesPage() {
               ) : (
                 <CategoryTree
                   categories={filteredCategories}
-                  onAddCategory={handleAddCategory}
+                  onAddCategory={handleAddCategoryFromTree}
                   onEditCategory={handleEditCategory}
                   onDeleteCategory={handleDeleteCategory}
                 />
@@ -294,6 +302,3 @@ export default function CategoriesPage() {
     </div>
   );
 }
-
-
-

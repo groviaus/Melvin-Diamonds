@@ -1,9 +1,4 @@
-import { Product } from "@/app/api/products/route";
-import {
-  CategoryData,
-  Category,
-  Subcategory,
-} from "@/app/api/categories/route";
+import { Product, CategoryData, Category, Subcategory } from "@/types";
 
 const API_BASE = "/api";
 

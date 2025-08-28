@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Overview
 
-## Getting Started
+Next.js 15 app with MySQL for products/categories and local file uploads for images.
 
-First, run the development server:
+## Environment Variables
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Create `.env.local` for dev and `.env.production` for prod with:
+
+```
+DB_HOST=...
+DB_USER=...
+DB_PASSWORD=...
+DB_NAME=...
+DB_PORT=3306
+# Optional upload overrides
+UPLOADS_DIR=/absolute/path/to/uploads
+UPLOADS_PUBLIC_BASE=/uploads
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install deps: `pnpm install`
+2. Start MySQL and create database from `DB_NAME`
+3. Run dev: `pnpm dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Tables auto-create on first request via `src/lib/db.ts`.
 
-## Learn More
+## API
 
-To learn more about Next.js, take a look at the following resources:
+- Products: `GET/POST /api/products`, `GET/PUT/DELETE /api/products/[id]`
+- Categories: `GET/POST/PUT/DELETE /api/categories`
+- Upload: `POST /api/upload` returns `{ url, filename }`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## File Uploads
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Stored under `public/uploads` by default (configurable with `UPLOADS_DIR`)
+- Served statically by Next.js
+- Ignored by git via `.gitignore`
 
-## Deploy on Vercel
+## Deploy to Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Set the DB env vars in Vercel Project Settings
+- Ensure `runtime = "nodejs"` is set in routes that use fs (done for `/api/upload`)
+- Build and deploy as usual
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy to VPS
+
+1. Clone repo and `pnpm install`
+2. Configure `.env.production`
+3. Create uploads dir: `mkdir -p public/uploads && chmod 755 public/uploads`
+4. Build: `pnpm build`
+5. Start with pm2: `pm2 start pnpm --name melvin-diamonds -- start`
+6. Configure reverse proxy (nginx) to Node server port
+
+## Security & Notes
+
+- Never commit `.env*` or `uploads/`
+- API validates input and uses prepared statements
+- JSON columns parsed server-side for consistent shape

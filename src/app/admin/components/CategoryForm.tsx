@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PlusIcon, Loader2Icon } from "lucide-react";
-import { Category, Subcategory } from "@/app/api/categories/route";
+import { Category, Subcategory } from "@/types";
 
 interface CategoryFormProps {
   categories: Category[];
@@ -187,6 +187,3 @@ export default function CategoryForm({
     </Card>
   );
 }
-
-
-

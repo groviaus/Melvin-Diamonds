@@ -3,6 +3,8 @@ import { promises as fs } from "fs";
 import path from "path";
 import pool from "@/lib/db";
 
+export const runtime = "nodejs";
+
 // Types for our category data
 export interface Subcategory {
   id: string;
@@ -61,12 +63,26 @@ function generateId(): string {
 }
 
 // Helper to recursively build the category tree from a flat list
-function buildTree(categories: any[], parentId: string | null = null): any[] {
+type FlatCategory = {
+  id: string;
+  name: string;
+  parentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function buildTree(
+  categories: FlatCategory[],
+  parentId: string | null = null
+): Category[] {
   return categories
     .filter((category) => category.parentId === parentId)
     .map((category) => ({
-      ...category,
-      subcategories: buildTree(categories, category.id),
+      id: category.id,
+      name: category.name,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+      subcategories: buildTree(categories, category.id) as Subcategory[],
     }));
 }
 
@@ -141,7 +157,7 @@ export async function GET() {
     const [rows] = await pool.query(
       "SELECT * FROM categories ORDER BY createdAt ASC"
     );
-    const tree = buildTree(rows as any[]);
+    const tree = buildTree(rows as FlatCategory[]);
     return NextResponse.json({ categories: tree });
   } catch (dbError) {
     console.warn(
@@ -216,12 +232,12 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const [result]: any = await pool.execute(
+    const [result] = await pool.execute(
       "UPDATE categories SET name = ? WHERE id = ?",
       [name.trim(), id]
     );
 
-    if (result.affectedRows === 0) {
+    if ((result as unknown as { affectedRows?: number }).affectedRows === 0) {
       return NextResponse.json(
         { error: "Category not found" },
         { status: 404 }
@@ -251,12 +267,11 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const [result]: any = await pool.execute(
-      "DELETE FROM categories WHERE id = ?",
-      [id]
-    );
+    const [result] = await pool.execute("DELETE FROM categories WHERE id = ?", [
+      id,
+    ]);
 
-    if (result.affectedRows === 0) {
+    if ((result as unknown as { affectedRows?: number }).affectedRows === 0) {
       return NextResponse.json(
         { error: "Category not found" },
         { status: 404 }

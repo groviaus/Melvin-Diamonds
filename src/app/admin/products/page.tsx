@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -20,7 +21,7 @@ import {
 } from "lucide-react";
 import ProductForm from "../components/ProductForm";
 import { productAPI } from "@/lib/api";
-import { Product } from "@/app/api/products/route";
+import { Product } from "@/types";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -152,9 +153,11 @@ export default function ProductsPage() {
                     >
                       <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
                         {product.mainImage && (
-                          <img
+                          <Image
                             src={product.mainImage}
                             alt={product.title}
+                            width={64}
+                            height={64}
                             className="w-full h-full object-cover"
                           />
                         )}

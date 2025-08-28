@@ -1,43 +1,58 @@
 import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
-import { Product } from "../route";
+import { Product } from "@/types";
 import pool from "@/lib/db";
+import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
-// Path to our JSON data file
-const dataFilePath = path.join(process.cwd(), "data", "products.json");
-
-// Read products from JSON file
-async function readProductsFromFile(): Promise<Product[]> {
-  try {
-    const data = await fs.readFile(dataFilePath, "utf-8");
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
-
-// Write products to JSON file
-async function writeProductsToFile(products: Product[]) {
-  await fs.writeFile(dataFilePath, JSON.stringify(products, null, 2));
-}
+export const runtime = "nodejs";
 
 // GET /api/products/[id] - Get product by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const [rows]: any[] = await pool.query(
+    const { id } = await params;
+    interface ProductRow extends RowDataPacket {
+      id: string;
+      title: string;
+      description: string;
+      price: number;
+      mainImage: string;
+      galleryImages: unknown;
+      ringSizes: unknown;
+      categories: unknown;
+      tags: unknown;
+      createdAt: string;
+      updatedAt: string;
+    }
+    const [rows] = await pool.query<ProductRow[]>(
       "SELECT * FROM products WHERE id = ?",
-      [params.id]
+      [id]
     );
     if (rows.length === 0) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
-    return NextResponse.json({ product: rows[0] });
+    const row = rows[0];
+    const product: Product = {
+      ...row,
+      galleryImages:
+        typeof row.galleryImages === "string"
+          ? JSON.parse(row.galleryImages)
+          : row.galleryImages ?? [],
+      ringSizes:
+        typeof row.ringSizes === "string"
+          ? JSON.parse(row.ringSizes)
+          : row.ringSizes ?? [],
+      categories:
+        typeof row.categories === "string"
+          ? JSON.parse(row.categories)
+          : row.categories ?? [],
+      tags:
+        typeof row.tags === "string" ? JSON.parse(row.tags) : row.tags ?? [],
+    };
+    return NextResponse.json({ product });
   } catch (dbError) {
-    console.error(`Database error getting product ${params.id}:`, dbError);
+    console.error(`Database error getting product`, dbError);
     return NextResponse.json(
       { error: "Failed to fetch product" },
       { status: 500 }
@@ -48,9 +63,10 @@ export async function GET(
 // PUT /api/products/[id] - Update product
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const {
       title,
@@ -106,24 +122,54 @@ export async function PUT(
       );
     }
 
-    values.push(params.id);
+    values.push(id);
     const query = `UPDATE products SET ${fields.join(", ")} WHERE id = ?`;
 
-    const [result]: any = await pool.execute(query, values);
+    const [result] = await pool.execute<ResultSetHeader>(query, values);
 
     if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     // Fetch and return the updated product
-    const [updatedRows]: any[] = await pool.query(
+    interface ProductRow extends RowDataPacket {
+      id: string;
+      title: string;
+      description: string;
+      price: number;
+      mainImage: string;
+      galleryImages: unknown;
+      ringSizes: unknown;
+      categories: unknown;
+      tags: unknown;
+      createdAt: string;
+      updatedAt: string;
+    }
+    const [updatedRows] = await pool.query<ProductRow[]>(
       "SELECT * FROM products WHERE id = ?",
-      [params.id]
+      [id]
     );
-
-    return NextResponse.json({ product: updatedRows[0] });
+    const row = (updatedRows as ProductRow[])[0];
+    const product: Product = {
+      ...row,
+      galleryImages:
+        typeof row.galleryImages === "string"
+          ? JSON.parse(row.galleryImages)
+          : row.galleryImages ?? [],
+      ringSizes:
+        typeof row.ringSizes === "string"
+          ? JSON.parse(row.ringSizes)
+          : row.ringSizes ?? [],
+      categories:
+        typeof row.categories === "string"
+          ? JSON.parse(row.categories)
+          : row.categories ?? [],
+      tags:
+        typeof row.tags === "string" ? JSON.parse(row.tags) : row.tags ?? [],
+    };
+    return NextResponse.json({ product });
   } catch (dbError) {
-    console.error(`Database error updating product ${params.id}:`, dbError);
+    console.error(`Database error updating product`, dbError);
     return NextResponse.json(
       { error: "Failed to update product" },
       { status: 500 }
@@ -134,12 +180,13 @@ export async function PUT(
 // DELETE /api/products/[id] - Delete product
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const [result]: any = await pool.execute(
+    const { id } = await params;
+    const [result] = await pool.execute<ResultSetHeader>(
       "DELETE FROM products WHERE id = ?",
-      [params.id]
+      [id]
     );
 
     if (result.affectedRows === 0) {
@@ -148,7 +195,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (dbError) {
-    console.error(`Database error deleting product ${params.id}:`, dbError);
+    console.error(`Database error deleting product:`, dbError);
     return NextResponse.json(
       { error: "Failed to delete product" },
       { status: 500 }

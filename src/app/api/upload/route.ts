@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -28,7 +30,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
+    const baseUploads =
+      process.env.UPLOADS_DIR || path.join(process.cwd(), "public", "uploads");
+    const uploadsDir = baseUploads;
     await mkdir(uploadsDir, { recursive: true });
 
     // Generate unique filename
@@ -44,7 +48,8 @@ export async function POST(request: NextRequest) {
     await writeFile(filepath, buffer);
 
     // Return the public URL
-    const publicUrl = `/uploads/${filename}`;
+    const publicBase = process.env.UPLOADS_PUBLIC_BASE || "/uploads";
+    const publicUrl = `${publicBase}/${filename}`;
 
     console.log("File uploaded successfully:", {
       filename,

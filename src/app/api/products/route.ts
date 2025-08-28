@@ -54,14 +54,46 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
+function parseMaybeJson<T>(value: unknown, fallback: T): T {
+  try {
+    if (Array.isArray(value)) return value as unknown as T;
+    if (typeof value === "string") return JSON.parse(value) as T;
+    if (value === null || value === undefined) return fallback;
+    return value as T;
+  } catch {
+    return fallback;
+  }
+}
+
 // GET /api/products - Get all products
+export const runtime = "nodejs";
+
 export async function GET() {
   try {
+    interface ProductRow extends Record<string, unknown> {
+      id: string;
+      title: string;
+      description: string;
+      price: number;
+      mainImage: string;
+      galleryImages: unknown;
+      ringSizes: unknown;
+      categories: unknown;
+      tags: unknown;
+      createdAt: string;
+      updatedAt: string;
+    }
     const [rows] = await pool.query(
       "SELECT * FROM products ORDER BY createdAt DESC"
     );
-    // The JSON columns will be automatically parsed
-    return NextResponse.json({ products: rows });
+    const normalized = (rows as ProductRow[]).map((row) => ({
+      ...row,
+      galleryImages: parseMaybeJson<string[]>(row.galleryImages, []),
+      ringSizes: parseMaybeJson<string[]>(row.ringSizes, []),
+      categories: parseMaybeJson<string[]>(row.categories, []),
+      tags: parseMaybeJson<string[]>(row.tags, []),
+    }));
+    return NextResponse.json({ products: normalized });
   } catch (dbError) {
     console.warn(
       "Database connection failed, falling back to JSON file for GET products.",
@@ -94,7 +126,14 @@ export async function POST(request: NextRequest) {
       tags = [],
     } = body;
 
-    if (!title || !description || !price || !mainImage) {
+    if (
+      !title ||
+      !description ||
+      price === undefined ||
+      price === null ||
+      isNaN(Number(price)) ||
+      !mainImage
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -115,7 +154,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
-    await pool.execute(
+    const [result] = await pool.execute(
       `INSERT INTO products (id, title, description, price, mainImage, galleryImages, ringSizes, categories, tags) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -130,6 +169,16 @@ export async function POST(request: NextRequest) {
         JSON.stringify(newProduct.tags),
       ]
     );
+
+    if (
+      !result ||
+      (result as unknown as { affectedRows?: number }).affectedRows === 0
+    ) {
+      return NextResponse.json(
+        { error: "Failed to create product" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ product: newProduct }, { status: 201 });
   } catch (dbError) {

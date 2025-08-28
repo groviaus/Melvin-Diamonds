@@ -13,7 +13,7 @@ import {
   CheckIcon,
   XIcon,
 } from "lucide-react";
-import { Category, Subcategory } from "@/app/api/categories/route";
+import { Category, Subcategory } from "@/types";
 
 interface CategoryTreeProps {
   categories: Category[];
@@ -208,6 +208,3 @@ export default function CategoryTree({
     </div>
   );
 }
-
-
-
