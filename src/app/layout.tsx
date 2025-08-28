@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Header from "./home/sections/header/page";
-import Footer from "./home/sections/footer/page";
+import ConditionalLayout from "../components/ConditionalLayout";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -53,7 +52,6 @@ export const metadata: Metadata = {
         sizes: "32x32",
         type: "image/png",
       },
-     
     ],
     apple: [
       {
@@ -99,9 +97,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} font-playfair antialiased`}>
-        <Header />
-        {children}
-        <Footer />
+        <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
   );

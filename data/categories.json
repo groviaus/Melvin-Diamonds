@@ -1,0 +1,84 @@
+{
+  "categories": [
+    {
+      "id": "jewellery_001",
+      "name": "Jewellery",
+      "subcategories": [
+        {
+          "id": "for_him_001",
+          "name": "For Him",
+          "subcategories": [
+            {
+              "id": "rings_him_001",
+              "name": "Rings",
+              "createdAt": "2024-01-01T00:00:00.000Z",
+              "updatedAt": "2024-01-01T00:00:00.000Z"
+            },
+            {
+              "id": "ear_accessories_001",
+              "name": "Ear Accessories",
+              "createdAt": "2024-01-01T00:00:00.000Z",
+              "updatedAt": "2024-01-01T00:00:00.000Z"
+            },
+            {
+              "id": "chains_bracelets_001",
+              "name": "Chains / Bracelets",
+              "createdAt": "2024-01-01T00:00:00.000Z",
+              "updatedAt": "2024-01-01T00:00:00.000Z"
+            }
+          ],
+          "createdAt": "2024-01-01T00:00:00.000Z",
+          "updatedAt": "2024-01-01T00:00:00.000Z"
+        },
+        {
+          "id": "for_her_001",
+          "name": "For Her",
+          "subcategories": [
+            {
+              "id": "rings_her_001",
+              "name": "Rings",
+              "createdAt": "2024-01-01T00:00:00.000Z",
+              "updatedAt": "2024-01-01T00:00:00.000Z"
+            },
+            {
+              "id": "earrings_001",
+              "name": "Earrings",
+              "createdAt": "2024-01-01T00:00:00.000Z",
+              "updatedAt": "2024-01-01T00:00:00.000Z"
+            },
+            {
+              "id": "bracelets_001",
+              "name": "Bracelets",
+              "createdAt": "2024-01-01T00:00:00.000Z",
+              "updatedAt": "2024-01-01T00:00:00.000Z"
+            },
+            {
+              "id": "nose_jewels_001",
+              "name": "Nose Jewels",
+              "createdAt": "2024-01-01T00:00:00.000Z",
+              "updatedAt": "2024-01-01T00:00:00.000Z"
+            }
+          ],
+          "createdAt": "2024-01-01T00:00:00.000Z",
+          "updatedAt": "2024-01-01T00:00:00.000Z"
+        }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "raw_diamonds_001",
+      "name": "Raw Diamonds",
+      "subcategories": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "personalised_001",
+      "name": "Personalised / Customised",
+      "subcategories": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}

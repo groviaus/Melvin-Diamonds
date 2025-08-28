@@ -54,7 +54,7 @@ export default function GallerySection() {
             />
             <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-3">
               <p className="text-sm font-medium text-gray-800 text-center">
-                Artisan's Dedication
+                Artisan&apos;s Dedication
               </p>
             </div>
           </div>
