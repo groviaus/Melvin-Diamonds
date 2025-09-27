@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface RingCategory {
@@ -91,7 +92,9 @@ export default function RingShowcase() {
                 />
               </div>
               <h3 className=" ml-1 text-center sm:text-left text-gray-900 font-medium text-xs sm:text-sm lg:text-base mb-4 sm:mb-0">
-                {category.name}
+                <Link href={`/category/${encodeURIComponent(category.name)}`}>
+                  {category.name}
+                </Link>
               </h3>
             </div>
           ))}

@@ -1,12 +1,13 @@
 import { Product, CategoryData, Category, Subcategory } from "@/types";
 
-const API_BASE = "/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
 
 // Product API functions
 export const productAPI = {
   // Get all products
   async getAll(): Promise<Product[]> {
-    const response = await fetch(`${API_BASE}/products`);
+    const url = `${API_BASE}/products`;
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error("Failed to fetch products");
     }

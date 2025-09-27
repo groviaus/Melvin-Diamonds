@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { productAPI } from "@/lib/api";
+import { Product } from "@/types";
+import { resolveMediaUrl } from "@/lib/utils";
 
 interface Category {
   name: string;
@@ -12,32 +16,24 @@ interface Category {
 }
 
 export default function BestSellers() {
-  const categories: Category[] = [
-    {
-      name: "Solitaire Rings",
-      image: "/images/best-sellers/best-sellers (1).jpeg",
-      bgimage: "/images/best-sellers/best-sellers (1) copy.jpeg",
-      bgColor: "bg-green-50",
-    },
-    {
-      name: "Nature Inspired Rings",
-      image: "/images/best-sellers/best-sellers (2).jpeg",
-      bgimage: "/images/best-sellers/best-sellers (2) copy.jpeg",
-      bgColor: "bg-gray-50",
-    },
-    {
-      name: "Three Stone Rings",
-      image: "/images/best-sellers/best-sellers (3).jpeg",
-      bgimage: "/images/best-sellers/best-sellers (3) copy.jpeg",
-      bgColor: "bg-green-50",
-    },
-    {
-      name: "Bridal Sets",
-      image: "/images/best-sellers/best-sellers (4).webp",
-      bgimage: "/images/best-sellers/best-sellers (4) copy.jpg",
-      bgColor: "bg-gray-50",
-    },
-  ];
+  const [best, setBest] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const products = await productAPI.getAll();
+        const filtered = products.filter((p) =>
+          (p.categories || []).some((c) =>
+            c.toLowerCase().includes("engagement")
+          )
+        );
+        setBest(filtered.slice(0, 8));
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    run();
+  }, []);
 
   return (
     <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 mx-auto">
@@ -51,17 +47,17 @@ export default function BestSellers() {
         </p>
       </div>
 
-      {/* Categories Grid */}
+      {/* Products Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-        {categories.map((category, index) => (
-          <CategoryCard key={index} category={category} />
+        {best.map((product) => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </section>
   );
 }
 
-function CategoryCard({ category }: { category: Category }) {
+function ProductCard({ product }: { product: Product }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -72,12 +68,12 @@ function CategoryCard({ category }: { category: Category }) {
     >
       {/* Product Image Container */}
       <div
-        className={`aspect-[4/5] ${category.bgColor} mb-2 sm:mb-3 lg:mb-4 flex items-center justify-center overflow-hidden shadow-sm relative`}
+        className={`aspect-[4/5] bg-gray-50 mb-2 sm:mb-3 lg:mb-4 flex items-center justify-center overflow-hidden shadow-sm relative`}
       >
         {/* Main image */}
         <Image
-          src={category.image}
-          alt={category.name}
+          src={resolveMediaUrl(product.mainImage)}
+          alt={product.title}
           fill
           className="object-cover object-center"
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -92,8 +88,10 @@ function CategoryCard({ category }: { category: Category }) {
           className="absolute inset-0 w-full h-full"
         >
           <Image
-            src={category.bgimage}
-            alt={category.name + " alternate"}
+            src={resolveMediaUrl(
+              product.galleryImages?.[0] || product.mainImage
+            )}
+            alt={product.title + " alternate"}
             fill
             className="object-cover object-center"
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -102,10 +100,13 @@ function CategoryCard({ category }: { category: Category }) {
         </motion.div>
       </div>
 
-      {/* Category Label */}
-      <h3 className="text-center font-light text-gray-900 text-xs sm:text-sm lg:text-lg mb-4 sm:mb-0">
-        {category.name}
+      {/* Product Label */}
+      <h3 className="text-center font-light text-gray-900 text-xs sm:text-sm lg:text-lg mb-1">
+        <Link href={`/products/${product.id}`}>{product.title}</Link>
       </h3>
+      <p className="text-center text-sm text-muted-foreground mb-4 sm:mb-0">
+        ${product.price}
+      </p>
     </motion.div>
   );
 }

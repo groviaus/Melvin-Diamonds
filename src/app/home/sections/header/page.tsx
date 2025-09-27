@@ -8,6 +8,8 @@ import {
   Menu,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import HeaderCartBadge from "@/components/HeaderCartBadge";
 
 export default function Header() {
   return (
@@ -59,7 +61,7 @@ export default function Header() {
                   height={150}
                   className="w-auto h-6 sm:w-12 sm:h-12 lg:w-auto lg:h-8 object-contain sm:mt-2"
                 />
-                  {/* <h1 className="text-lg sm:text-xl lg:text-3xl font-light tracking-[0.1em] sm:tracking-[0.15em] lg:tracking-[0.2em] text-gray-800 mb-1">
+                {/* <h1 className="text-lg sm:text-xl lg:text-3xl font-light tracking-[0.1em] sm:tracking-[0.15em] lg:tracking-[0.2em] text-gray-800 mb-1">
                     MEVLIN DIAMONDS<sup className="text-xs">®</sup>
                   </h1> */}
               </div>
@@ -70,7 +72,7 @@ export default function Header() {
               <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer " />
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer hidden sm:block" />
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer hidden sm:block" />
-              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer" />
+              <HeaderCartBadge />
               <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer sm:hidden" />
             </div>
           </div>
@@ -78,6 +80,9 @@ export default function Header() {
           {/* Navigation */}
           <nav className="pb-3 sm:pb-4 lg:pb-6 pt-1 sm:pt-2">
             <ul className="hidden sm:flex justify-center space-x-8 lg:space-x-16 text-xs sm:text-sm font-light text-gray-700 tracking-wide">
+              <li className="hover:text-teal-700 transition-colors cursor-pointer py-1 sm:py-2 border-b-2 border-transparent hover:border-teal-700">
+                <Link href="/products">SHOP</Link>
+              </li>
               <li className="hover:text-teal-700 transition-colors cursor-pointer py-1 sm:py-2 border-b-2 border-transparent hover:border-teal-700">
                 ENGAGEMENT RINGS
               </li>

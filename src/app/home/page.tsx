@@ -9,6 +9,7 @@ import About from "./sections/about/page";
 import Benefits from "./sections/benefits/page";
 import Experience from "./sections/experience/page";
 import Footer from "./sections/footer/page";
+import LatestProducts from "./sections/latest-products/page";
 
 export default function JewelryHomepage() {
   return (
@@ -19,6 +20,7 @@ export default function JewelryHomepage() {
       <DiamondShapes />
       <BestSellers />
       <RingShowcase />
+      <LatestProducts />
       <Collections />
       <About />
       <Benefits />

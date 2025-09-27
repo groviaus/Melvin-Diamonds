@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import ConditionalLayout from "../components/ConditionalLayout";
+import { CartProvider } from "@/contexts/CartContext";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -97,7 +98,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} font-playfair antialiased`}>
-        <ConditionalLayout>{children}</ConditionalLayout>
+        <CartProvider>
+          <ConditionalLayout>{children}</ConditionalLayout>
+        </CartProvider>
       </body>
     </html>
   );

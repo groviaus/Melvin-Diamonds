@@ -22,6 +22,7 @@ import {
 import ProductForm from "../components/ProductForm";
 import { productAPI } from "@/lib/api";
 import { Product } from "@/types";
+import { resolveMediaUrl } from "@/lib/utils";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -154,7 +155,7 @@ export default function ProductsPage() {
                       <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
                         {product.mainImage && (
                           <Image
-                            src={product.mainImage}
+                            src={resolveMediaUrl(product.mainImage)}
                             alt={product.title}
                             width={64}
                             height={64}

@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { XIcon, UploadIcon, PlusIcon, Loader2Icon } from "lucide-react";
 import { productAPI, uploadAPI } from "@/lib/api";
 import { Product } from "@/types";
+import { resolveMediaUrl } from "@/lib/utils";
 
 interface ProductFormData {
   title: string;
@@ -361,7 +362,7 @@ export default function ProductForm({
               {formData.mainImageUrl ? (
                 <div className="space-y-2">
                   <Image
-                    src={formData.mainImageUrl}
+                    src={resolveMediaUrl(formData.mainImageUrl)}
                     alt="Main product"
                     width={800}
                     height={320}
@@ -446,7 +447,7 @@ export default function ProductForm({
                   {formData.galleryImageUrls.map((imageUrl, index) => (
                     <div key={index} className="relative">
                       <Image
-                        src={imageUrl}
+                        src={resolveMediaUrl(imageUrl)}
                         alt={`Gallery ${index + 1}`}
                         width={400}
                         height={96}

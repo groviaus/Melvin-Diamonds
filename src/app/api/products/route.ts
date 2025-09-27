@@ -99,15 +99,18 @@ export async function GET() {
       "Database connection failed, falling back to JSON file for GET products.",
       dbError
     );
-    try {
-      const products = await readProductsFromFile();
-      return NextResponse.json({ products });
-    } catch (fileError) {
-      return NextResponse.json(
-        { error: "Failed to fetch products from both database and file" },
-        { status: 500 }
-      );
+    if (process.env.FILE_FALLBACK === "true") {
+      try {
+        const products = await readProductsFromFile();
+        return NextResponse.json({ products });
+      } catch (fileError) {
+        return NextResponse.json(
+          { error: "Failed to fetch products from both database and file" },
+          { status: 500 }
+        );
+      }
     }
+    return NextResponse.json({ products: [] });
   }
 }
 

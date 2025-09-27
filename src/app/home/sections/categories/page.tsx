@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { categoryAPI } from "@/lib/api";
 
 interface Category {
   name: string;
@@ -12,7 +14,7 @@ interface Category {
 }
 
 export default function Categories() {
-  const categories: Category[] = [
+  const staticCategories: Category[] = [
     {
       name: "Engagement Rings",
       image: "/images/categories/engagement.jpeg",
@@ -50,6 +52,70 @@ export default function Categories() {
       bgColor: "bg-gray-50",
     },
   ];
+
+  const [apiCategories, setApiCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const data = await categoryAPI.getAll();
+        const topLevel = (data.categories || []).map((c) => c.name);
+        setApiCategories(topLevel);
+      } catch (e) {
+        // keep static
+        console.error(e);
+      }
+    };
+    run();
+  }, []);
+
+  const imageMap: Record<
+    string,
+    { image: string; bgimage: string; bgColor: string }
+  > = {
+    "Engagement Rings": {
+      image: "/images/categories/engagement.jpeg",
+      bgimage: "/images/categories/engagement.webp",
+      bgColor: "bg-green-50",
+    },
+    "Women's Wedding Rings": {
+      image: "/images/categories/weddingw.jpeg",
+      bgimage: "/images/categories/weddingw.webp",
+      bgColor: "bg-gray-50",
+    },
+    "Men's Wedding Rings": {
+      image: "/images/categories/weddingm.jpeg",
+      bgimage: "/images/categories/weddingm.webp",
+      bgColor: "bg-green-50",
+    },
+    "Gemstone Rings": {
+      image: "/images/categories/gemstone.jpeg",
+      bgimage: "/images/categories/gemstone.webp",
+      bgColor: "bg-gray-50",
+    },
+    "Fine Jewelry": {
+      image: "/images/categories/fine.jpeg",
+      bgimage: "/images/categories/fine.webp",
+      bgColor: "bg-green-50",
+    },
+    "Best Sellers": {
+      image: "/images/categories/best.jpeg",
+      bgimage: "/images/categories/best.webp",
+      bgColor: "bg-gray-50",
+    },
+  };
+
+  const categories: Category[] = useMemo(() => {
+    if (apiCategories.length === 0) return staticCategories;
+    return apiCategories.map((name, idx) => ({
+      name,
+      image: imageMap[name]?.image || "/images/categories/best.jpeg",
+      bgimage: imageMap[name]?.bgimage || "/images/categories/best.webp",
+      bgColor:
+        imageMap[name]?.bgColor ||
+        (idx % 2 === 0 ? "bg-gray-50" : "bg-green-50"),
+    }));
+  }, [apiCategories]);
 
   return (
     <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 mx-auto">
@@ -116,7 +182,9 @@ function CategoryCard({ category }: { category: Category }) {
 
       {/* Category Label */}
       <h3 className="text-center font-light text-gray-900 text-xs sm:text-sm lg:text-lg mb-4 sm:mb-0">
-        {category.name}
+        <Link href={`/category/${encodeURIComponent(category.name)}`}>
+          {category.name}
+        </Link>
       </h3>
     </motion.div>
   );
