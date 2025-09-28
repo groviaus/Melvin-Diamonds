@@ -38,16 +38,10 @@ async function readProductsFromFile(): Promise<Product[]> {
     await ensureDataDirectory();
     const data = await fs.readFile(dataFilePath, "utf-8");
     return JSON.parse(data);
-  } catch (error) {
+  } catch {
     // If file doesn't exist or is invalid, return empty array
     return [];
   }
-}
-
-// Write products to JSON file
-async function writeProductsToFile(products: Product[]) {
-  await ensureDataDirectory();
-  await fs.writeFile(dataFilePath, JSON.stringify(products, null, 2));
 }
 
 // Generate unique ID
@@ -106,7 +100,7 @@ export async function GET() {
       try {
         const products = await readProductsFromFile();
         return NextResponse.json({ products });
-      } catch (fileError) {
+      } catch {
         return NextResponse.json(
           { error: "Failed to fetch products from both database and file" },
           { status: 500 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { productAPI } from "@/lib/api";
 import { Product } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -135,10 +136,10 @@ export default function ProductDetailClient() {
               addItem(product, 1, selectedSize || undefined);
             }}
           >
-            <a href="/products">Back to Shop</a>
+            <Link href="/products">Back to Shop</Link>
           </Button>
           <Button asChild size="lg" className="rounded-none">
-            <a href="/checkout">Buy Now</a>
+            <Link href="/checkout">Buy Now</Link>
           </Button>
         </div>
       </div>

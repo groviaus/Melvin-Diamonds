@@ -14,45 +14,6 @@ interface Category {
 }
 
 export default function Categories() {
-  const staticCategories: Category[] = [
-    {
-      name: "Engagement Rings",
-      image: "/images/categories/engagement.jpeg",
-      bgimage: "/images/categories/engagement.webp",
-      bgColor: "bg-green-50",
-    },
-    {
-      name: "Women's Wedding Rings",
-      image: "/images/categories/weddingw.jpeg",
-      bgimage: "/images/categories/weddingw.webp",
-      bgColor: "bg-gray-50",
-    },
-    {
-      name: "Men's Wedding Rings",
-      image: "/images/categories/weddingm.jpeg",
-      bgimage: "/images/categories/weddingm.webp",
-      bgColor: "bg-green-50",
-    },
-    {
-      name: "Gemstone Rings",
-      image: "/images/categories/gemstone.jpeg",
-      bgimage: "/images/categories/gemstone.webp",
-      bgColor: "bg-gray-50",
-    },
-    {
-      name: "Fine Jewelry",
-      image: "/images/categories/fine.jpeg",
-      bgimage: "/images/categories/fine.webp",
-      bgColor: "bg-green-50",
-    },
-    {
-      name: "Best Sellers",
-      image: "/images/categories/best.jpeg",
-      bgimage: "/images/categories/best.webp",
-      bgColor: "bg-gray-50",
-    },
-  ];
-
   const [apiCategories, setApiCategories] = useState<string[]>([]);
 
   useEffect(() => {
@@ -69,43 +30,82 @@ export default function Categories() {
     run();
   }, []);
 
-  const imageMap: Record<
-    string,
-    { image: string; bgimage: string; bgColor: string }
-  > = {
-    "Engagement Rings": {
-      image: "/images/categories/engagement.jpeg",
-      bgimage: "/images/categories/engagement.webp",
-      bgColor: "bg-green-50",
-    },
-    "Women's Wedding Rings": {
-      image: "/images/categories/weddingw.jpeg",
-      bgimage: "/images/categories/weddingw.webp",
-      bgColor: "bg-gray-50",
-    },
-    "Men's Wedding Rings": {
-      image: "/images/categories/weddingm.jpeg",
-      bgimage: "/images/categories/weddingm.webp",
-      bgColor: "bg-green-50",
-    },
-    "Gemstone Rings": {
-      image: "/images/categories/gemstone.jpeg",
-      bgimage: "/images/categories/gemstone.webp",
-      bgColor: "bg-gray-50",
-    },
-    "Fine Jewelry": {
-      image: "/images/categories/fine.jpeg",
-      bgimage: "/images/categories/fine.webp",
-      bgColor: "bg-green-50",
-    },
-    "Best Sellers": {
-      image: "/images/categories/best.jpeg",
-      bgimage: "/images/categories/best.webp",
-      bgColor: "bg-gray-50",
-    },
-  };
-
   const categories: Category[] = useMemo(() => {
+    const staticCategories: Category[] = [
+      {
+        name: "Engagement Rings",
+        image: "/images/categories/engagement.jpeg",
+        bgimage: "/images/categories/engagement.webp",
+        bgColor: "bg-green-50",
+      },
+      {
+        name: "Women's Wedding Rings",
+        image: "/images/categories/weddingw.jpeg",
+        bgimage: "/images/categories/weddingw.webp",
+        bgColor: "bg-gray-50",
+      },
+      {
+        name: "Men's Wedding Rings",
+        image: "/images/categories/weddingm.jpeg",
+        bgimage: "/images/categories/weddingm.webp",
+        bgColor: "bg-green-50",
+      },
+      {
+        name: "Gemstone Rings",
+        image: "/images/categories/gemstone.jpeg",
+        bgimage: "/images/categories/gemstone.webp",
+        bgColor: "bg-gray-50",
+      },
+      {
+        name: "Fine Jewelry",
+        image: "/images/categories/fine.jpeg",
+        bgimage: "/images/categories/fine.webp",
+        bgColor: "bg-green-50",
+      },
+      {
+        name: "Best Sellers",
+        image: "/images/categories/best.jpeg",
+        bgimage: "/images/categories/best.webp",
+        bgColor: "bg-gray-50",
+      },
+    ];
+
+    const imageMap: Record<
+      string,
+      { image: string; bgimage: string; bgColor: string }
+    > = {
+      "Engagement Rings": {
+        image: "/images/categories/engagement.jpeg",
+        bgimage: "/images/categories/engagement.webp",
+        bgColor: "bg-green-50",
+      },
+      "Women's Wedding Rings": {
+        image: "/images/categories/weddingw.jpeg",
+        bgimage: "/images/categories/weddingw.webp",
+        bgColor: "bg-gray-50",
+      },
+      "Men's Wedding Rings": {
+        image: "/images/categories/weddingm.jpeg",
+        bgimage: "/images/categories/weddingm.webp",
+        bgColor: "bg-green-50",
+      },
+      "Gemstone Rings": {
+        image: "/images/categories/gemstone.jpeg",
+        bgimage: "/images/categories/gemstone.webp",
+        bgColor: "bg-gray-50",
+      },
+      "Fine Jewelry": {
+        image: "/images/categories/fine.jpeg",
+        bgimage: "/images/categories/fine.webp",
+        bgColor: "bg-green-50",
+      },
+      "Best Sellers": {
+        image: "/images/categories/best.jpeg",
+        bgimage: "/images/categories/best.webp",
+        bgColor: "bg-gray-50",
+      },
+    };
+
     if (apiCategories.length === 0) return staticCategories;
     return apiCategories.map((name, idx) => ({
       name,

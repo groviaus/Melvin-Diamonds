@@ -1,4 +1,3 @@
-import Header from "./sections/header/page";
 import Hero from "./sections/hero/page";
 import Categories from "./sections/categories/page";
 import DiamondShapes from "./sections/diamond-shapes/page";
@@ -8,7 +7,6 @@ import Collections from "./sections/collections/page";
 import About from "./sections/about/page";
 import Benefits from "./sections/benefits/page";
 import Experience from "./sections/experience/page";
-import Footer from "./sections/footer/page";
 import LatestProducts from "./sections/latest-products/page";
 
 export default function JewelryHomepage() {

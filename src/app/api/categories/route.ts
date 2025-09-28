@@ -45,16 +45,10 @@ async function readCategoriesFromFile(): Promise<CategoryData> {
     await ensureDataDirectory();
     const data = await fs.readFile(dataFilePath, "utf-8");
     return JSON.parse(data);
-  } catch (error) {
+  } catch {
     // If file doesn't exist or is invalid, return default structure
     return { categories: [] };
   }
-}
-
-// Write categories to JSON file
-async function writeCategoriesToFile(categoryData: CategoryData) {
-  await ensureDataDirectory();
-  await fs.writeFile(dataFilePath, JSON.stringify(categoryData, null, 2));
 }
 
 // Generate unique ID
@@ -86,71 +80,6 @@ function buildTree(
     }));
 }
 
-// Helper function to find and update a category/subcategory by ID
-function findAndUpdateCategory(
-  categories: Category[],
-  id: string,
-  updateFn: (item: Category | Subcategory) => void
-): boolean {
-  for (const category of categories) {
-    if (category.id === id) {
-      updateFn(category);
-      return true;
-    }
-    if (findAndUpdateInSubcategories(category.subcategories, id, updateFn)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function findAndUpdateInSubcategories(
-  subcategories: Subcategory[],
-  id: string,
-  updateFn: (item: Category | Subcategory) => void
-): boolean {
-  for (const subcategory of subcategories) {
-    if (subcategory.id === id) {
-      updateFn(subcategory);
-      return true;
-    }
-    if (findAndUpdateInSubcategories(subcategory.subcategories, id, updateFn)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Helper function to find and delete a category/subcategory by ID
-function findAndDeleteCategory(categories: Category[], id: string): boolean {
-  for (let i = 0; i < categories.length; i++) {
-    if (categories[i].id === id) {
-      categories.splice(i, 1);
-      return true;
-    }
-    if (findAndDeleteInSubcategories(categories[i].subcategories, id)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function findAndDeleteInSubcategories(
-  subcategories: Subcategory[],
-  id: string
-): boolean {
-  for (let i = 0; i < subcategories.length; i++) {
-    if (subcategories[i].id === id) {
-      subcategories.splice(i, 1);
-      return true;
-    }
-    if (findAndDeleteInSubcategories(subcategories[i].subcategories, id)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 // GET /api/categories - Get all categories
 export async function GET() {
   try {
@@ -167,7 +96,7 @@ export async function GET() {
     try {
       const categoryData = await readCategoriesFromFile();
       return NextResponse.json(categoryData);
-    } catch (fileError) {
+    } catch {
       return NextResponse.json(
         { error: "Failed to fetch categories from both database and file" },
         { status: 500 }
@@ -195,7 +124,7 @@ export async function POST(request: NextRequest) {
       parentId,
     };
 
-    const [result] = await pool.execute(
+    await pool.execute(
       "INSERT INTO categories (id, name, parentId) VALUES (?, ?, ?)",
       [newCategory.id, newCategory.name, newCategory.parentId]
     );

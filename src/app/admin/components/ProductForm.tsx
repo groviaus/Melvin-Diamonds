@@ -62,56 +62,6 @@ const defaultTags = [
   "Classic",
 ];
 
-interface CategoryOption {
-  id: string;
-  name: string;
-  level: number;
-}
-
-function flattenCategories(
-  categories: Category[],
-  level = 0
-): CategoryOption[] {
-  const result: CategoryOption[] = [];
-
-  for (const category of categories) {
-    result.push({
-      id: category.id,
-      name: category.name,
-      level,
-    });
-
-    if (category.subcategories) {
-      result.push(...flattenSubcategories(category.subcategories, level + 1));
-    }
-  }
-
-  return result;
-}
-
-function flattenSubcategories(
-  subcategories: Subcategory[],
-  level: number
-): CategoryOption[] {
-  const result: CategoryOption[] = [];
-
-  for (const subcategory of subcategories) {
-    result.push({
-      id: subcategory.id,
-      name: subcategory.name,
-      level,
-    });
-
-    if (subcategory.subcategories) {
-      result.push(
-        ...flattenSubcategories(subcategory.subcategories, level + 1)
-      );
-    }
-  }
-
-  return result;
-}
-
 interface ProductFormProps {
   editingProduct?: Product | null;
   onProductSaved?: () => void;
@@ -136,7 +86,6 @@ export default function ProductForm({
   });
 
   const [newRingSize, setNewRingSize] = useState("");
-  const [newCategory, setNewCategory] = useState("");
   const [newTag, setNewTag] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -269,26 +218,6 @@ export default function ProductForm({
     setFormData((prev) => ({
       ...prev,
       ringSizes: prev.ringSizes.filter((s) => s !== size),
-    }));
-  };
-
-  const addCategory = () => {
-    if (
-      newCategory.trim() &&
-      !formData.categories.includes(newCategory.trim())
-    ) {
-      setFormData((prev) => ({
-        ...prev,
-        categories: [...prev.categories, newCategory.trim()],
-      }));
-      setNewCategory("");
-    }
-  };
-
-  const removeCategory = (category: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      categories: prev.categories.filter((c) => c !== category),
     }));
   };
 

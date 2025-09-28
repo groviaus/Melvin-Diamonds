@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 export default function BannerSection() {
   return (
     <section className="relative h-[500px]">

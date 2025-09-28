@@ -8,13 +8,6 @@ import { productAPI } from "@/lib/api";
 import { Product } from "@/types";
 import { resolveMediaUrl } from "@/lib/utils";
 
-interface Category {
-  name: string;
-  image: string;
-  bgimage: string;
-  bgColor: string;
-}
-
 export default function BestSellers() {
   const [best, setBest] = useState<Product[]>([]);
 

@@ -1,12 +1,4 @@
-import {
-  Search,
-  User,
-  Heart,
-  ShoppingBag,
-  Phone,
-  Calendar,
-  Menu,
-} from "lucide-react";
+import { Search, User, Heart, Phone, Calendar, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import HeaderCartBadge from "@/components/HeaderCartBadge";
