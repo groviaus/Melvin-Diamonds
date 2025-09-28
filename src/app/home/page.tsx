@@ -14,11 +14,11 @@ export default function JewelryHomepage() {
     <div className="min-h-screen bg-white">
       {/* <Header /> */}
       <Hero />
+      <LatestProducts />
       <Categories />
       <DiamondShapes />
-      <BestSellers />
+      {/* <BestSellers /> */}
       <RingShowcase />
-      <LatestProducts />
       <Collections />
       <About />
       <Benefits />
