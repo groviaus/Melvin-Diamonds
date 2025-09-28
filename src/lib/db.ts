@@ -41,6 +41,7 @@ async function createTables() {
         ringSizes ${jsonType} NOT NULL,
         categories ${jsonType} NOT NULL,
         tags ${jsonType} NOT NULL,
+        details ${jsonType} NOT NULL,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )

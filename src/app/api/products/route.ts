@@ -14,6 +14,7 @@ export interface Product {
   ringSizes: string[];
   categories: string[];
   tags: string[];
+  details: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -80,6 +81,7 @@ export async function GET() {
       ringSizes: unknown;
       categories: unknown;
       tags: unknown;
+      details: unknown;
       createdAt: string;
       updatedAt: string;
     }
@@ -92,6 +94,7 @@ export async function GET() {
       ringSizes: parseMaybeJson<string[]>(row.ringSizes, []),
       categories: parseMaybeJson<string[]>(row.categories, []),
       tags: parseMaybeJson<string[]>(row.tags, []),
+      details: parseMaybeJson<string[]>(row.details, []),
     }));
     return NextResponse.json({ products: normalized });
   } catch (dbError) {
@@ -127,6 +130,7 @@ export async function POST(request: NextRequest) {
       ringSizes = [],
       categories = [],
       tags = [],
+      details = [],
     } = body;
 
     if (
@@ -155,11 +159,12 @@ export async function POST(request: NextRequest) {
       tags,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      details,
     };
 
     const [result] = await pool.execute(
-      `INSERT INTO products (id, title, description, price, mainImage, galleryImages, ringSizes, categories, tags) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (id, title, description, price, mainImage, galleryImages, ringSizes, categories, tags, details) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         newProduct.id,
         newProduct.title,
@@ -170,6 +175,7 @@ export async function POST(request: NextRequest) {
         JSON.stringify(newProduct.ringSizes),
         JSON.stringify(newProduct.categories),
         JSON.stringify(newProduct.tags),
+        JSON.stringify(newProduct.details),
       ]
     );
 

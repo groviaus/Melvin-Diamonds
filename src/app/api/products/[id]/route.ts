@@ -22,6 +22,7 @@ export async function GET(
       ringSizes: unknown;
       categories: unknown;
       tags: unknown;
+      details: unknown;
       createdAt: string;
       updatedAt: string;
     }
@@ -49,6 +50,10 @@ export async function GET(
           : row.categories ?? [],
       tags:
         typeof row.tags === "string" ? JSON.parse(row.tags) : row.tags ?? [],
+      details:
+        typeof row.details === "string"
+          ? JSON.parse(row.details)
+          : row.details ?? [],
     };
     return NextResponse.json({ product });
   } catch (dbError) {
@@ -77,6 +82,7 @@ export async function PUT(
       ringSizes,
       categories,
       tags,
+      details,
     } = body;
 
     // Build query dynamically based on fields provided
@@ -114,6 +120,10 @@ export async function PUT(
       fields.push("tags = ?");
       values.push(JSON.stringify(tags));
     }
+    if (details) {
+      fields.push("details = ?");
+      values.push(JSON.stringify(details));
+    }
 
     if (fields.length === 0) {
       return NextResponse.json(
@@ -142,6 +152,7 @@ export async function PUT(
       ringSizes: unknown;
       categories: unknown;
       tags: unknown;
+      details: unknown;
       createdAt: string;
       updatedAt: string;
     }
@@ -166,6 +177,10 @@ export async function PUT(
           : row.categories ?? [],
       tags:
         typeof row.tags === "string" ? JSON.parse(row.tags) : row.tags ?? [],
+      details:
+        typeof row.details === "string"
+          ? JSON.parse(row.details)
+          : row.details ?? [],
     };
     return NextResponse.json({ product });
   } catch (dbError) {

@@ -1,84 +1,91 @@
 {
   "categories": [
     {
-      "id": "jewellery_001",
+      "id": "mewhj6wof9vrkal0fk",
       "name": "Jewellery",
+      "createdAt": "2025-08-29T07:02:09.000Z",
+      "updatedAt": "2025-08-29T07:02:09.000Z",
       "subcategories": [
         {
-          "id": "for_him_001",
-          "name": "For Him",
+          "id": "mewhkiq8jhu7y9hgfn",
+          "name": "Him",
+          "createdAt": "2025-08-29T07:03:11.000Z",
+          "updatedAt": "2025-08-29T07:03:11.000Z",
           "subcategories": [
             {
-              "id": "rings_him_001",
+              "id": "mewhl3tfkkdhptunjii",
               "name": "Rings",
-              "createdAt": "2024-01-01T00:00:00.000Z",
-              "updatedAt": "2024-01-01T00:00:00.000Z"
+              "createdAt": "2025-08-29T07:03:38.000Z",
+              "updatedAt": "2025-08-29T07:03:38.000Z",
+              "subcategories": []
             },
             {
-              "id": "ear_accessories_001",
+              "id": "mewhnbfmnddl0i9ub9",
               "name": "Ear Accessories",
-              "createdAt": "2024-01-01T00:00:00.000Z",
-              "updatedAt": "2024-01-01T00:00:00.000Z"
+              "createdAt": "2025-08-29T07:05:21.000Z",
+              "updatedAt": "2025-08-29T07:05:21.000Z",
+              "subcategories": []
             },
             {
-              "id": "chains_bracelets_001",
-              "name": "Chains / Bracelets",
-              "createdAt": "2024-01-01T00:00:00.000Z",
-              "updatedAt": "2024-01-01T00:00:00.000Z"
+              "id": "mewhnwo9n8aijms3k6",
+              "name": "Chains/Bracelets",
+              "createdAt": "2025-08-29T07:05:49.000Z",
+              "updatedAt": "2025-08-29T07:05:49.000Z",
+              "subcategories": []
             }
-          ],
-          "createdAt": "2024-01-01T00:00:00.000Z",
-          "updatedAt": "2024-01-01T00:00:00.000Z"
+          ]
         },
         {
-          "id": "for_her_001",
-          "name": "For Her",
+          "id": "mewho3q3eaqqw7gdsu",
+          "name": "Her",
+          "createdAt": "2025-08-29T07:05:58.000Z",
+          "updatedAt": "2025-08-29T07:05:58.000Z",
           "subcategories": [
             {
-              "id": "rings_her_001",
+              "id": "mewhocvg992y6ck6tdh",
               "name": "Rings",
-              "createdAt": "2024-01-01T00:00:00.000Z",
-              "updatedAt": "2024-01-01T00:00:00.000Z"
+              "createdAt": "2025-08-29T07:06:10.000Z",
+              "updatedAt": "2025-08-29T07:06:10.000Z",
+              "subcategories": []
             },
             {
-              "id": "earrings_001",
+              "id": "mewhourakbo9g734l3j",
               "name": "Earrings",
-              "createdAt": "2024-01-01T00:00:00.000Z",
-              "updatedAt": "2024-01-01T00:00:00.000Z"
+              "createdAt": "2025-08-29T07:06:33.000Z",
+              "updatedAt": "2025-08-29T07:06:33.000Z",
+              "subcategories": []
             },
             {
-              "id": "bracelets_001",
+              "id": "mewhp3l7w6w5tur5gba",
               "name": "Bracelets",
-              "createdAt": "2024-01-01T00:00:00.000Z",
-              "updatedAt": "2024-01-01T00:00:00.000Z"
+              "createdAt": "2025-08-29T07:06:44.000Z",
+              "updatedAt": "2025-08-29T07:06:44.000Z",
+              "subcategories": []
             },
             {
-              "id": "nose_jewels_001",
+              "id": "mewhqo2jqmacigzbglk",
               "name": "Nose Jewels",
-              "createdAt": "2024-01-01T00:00:00.000Z",
-              "updatedAt": "2024-01-01T00:00:00.000Z"
+              "createdAt": "2025-08-29T07:07:58.000Z",
+              "updatedAt": "2025-08-29T07:07:58.000Z",
+              "subcategories": []
             }
-          ],
-          "createdAt": "2024-01-01T00:00:00.000Z",
-          "updatedAt": "2024-01-01T00:00:00.000Z"
+          ]
         }
-      ],
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
+      ]
     },
     {
-      "id": "raw_diamonds_001",
+      "id": "mewhr5pu92i5hb06nmk",
       "name": "Raw Diamonds",
-      "subcategories": [],
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
+      "createdAt": "2025-08-29T07:08:21.000Z",
+      "updatedAt": "2025-08-29T07:08:21.000Z",
+      "subcategories": []
     },
     {
-      "id": "personalised_001",
-      "name": "Personalised / Customised",
-      "subcategories": [],
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
+      "id": "mewhrgu2wk61t8nrnyl",
+      "name": "Personalised",
+      "createdAt": "2025-08-29T07:08:35.000Z",
+      "updatedAt": "2025-08-29T07:08:45.000Z",
+      "subcategories": []
     }
   ]
 }

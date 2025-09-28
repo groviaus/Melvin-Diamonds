@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import {
   Card,
@@ -14,8 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { XIcon, UploadIcon, PlusIcon, Loader2Icon } from "lucide-react";
-import { productAPI, uploadAPI } from "@/lib/api";
-import { Product } from "@/types";
+import { productAPI, uploadAPI, categoryAPI } from "@/lib/api";
+import { Product, Category, Subcategory } from "@/types";
 import { resolveMediaUrl } from "@/lib/utils";
 
 interface ProductFormData {
@@ -29,6 +30,7 @@ interface ProductFormData {
   ringSizes: string[];
   categories: string[];
   tags: string[];
+  details: string;
 }
 
 const defaultRingSizes = [
@@ -50,13 +52,6 @@ const defaultRingSizes = [
   "11.5",
   "12",
 ];
-const defaultCategories = [
-  "Engagement",
-  "Wedding",
-  "Anniversary",
-  "Birthday",
-  "Graduation",
-];
 const defaultTags = [
   "Diamond",
   "Gold",
@@ -66,6 +61,56 @@ const defaultTags = [
   "Modern",
   "Classic",
 ];
+
+interface CategoryOption {
+  id: string;
+  name: string;
+  level: number;
+}
+
+function flattenCategories(
+  categories: Category[],
+  level = 0
+): CategoryOption[] {
+  const result: CategoryOption[] = [];
+
+  for (const category of categories) {
+    result.push({
+      id: category.id,
+      name: category.name,
+      level,
+    });
+
+    if (category.subcategories) {
+      result.push(...flattenSubcategories(category.subcategories, level + 1));
+    }
+  }
+
+  return result;
+}
+
+function flattenSubcategories(
+  subcategories: Subcategory[],
+  level: number
+): CategoryOption[] {
+  const result: CategoryOption[] = [];
+
+  for (const subcategory of subcategories) {
+    result.push({
+      id: subcategory.id,
+      name: subcategory.name,
+      level,
+    });
+
+    if (subcategory.subcategories) {
+      result.push(
+        ...flattenSubcategories(subcategory.subcategories, level + 1)
+      );
+    }
+  }
+
+  return result;
+}
 
 interface ProductFormProps {
   editingProduct?: Product | null;
@@ -87,6 +132,7 @@ export default function ProductForm({
     ringSizes: [],
     categories: [],
     tags: [],
+    details: "",
   });
 
   const [newRingSize, setNewRingSize] = useState("");
@@ -95,6 +141,26 @@ export default function ProductForm({
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [availableCategories, setAvailableCategories] = useState<Category[]>(
+    []
+  );
+  const [categorySelectionPath, setCategorySelectionPath] = useState<
+    (Category | Subcategory)[]
+  >([]);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const categoryData = await categoryAPI.getAll();
+        setAvailableCategories(categoryData.categories);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        alert("Failed to load categories. Please try again.");
+      }
+    }
+    loadCategories();
+  }, []);
 
   // Populate form when editing product
   useEffect(() => {
@@ -110,6 +176,7 @@ export default function ProductForm({
         ringSizes: editingProduct.ringSizes,
         categories: editingProduct.categories,
         tags: editingProduct.tags,
+        details: editingProduct.details?.join("\n") || "",
       });
       setEditingProductId(editingProduct.id);
       setIsEditing(true);
@@ -126,6 +193,7 @@ export default function ProductForm({
         ringSizes: [],
         categories: [],
         tags: [],
+        details: "",
       });
       setEditingProductId(null);
       setIsEditing(false);
@@ -241,6 +309,32 @@ export default function ProductForm({
     }));
   };
 
+  const handleCategorySelect = (
+    category: Category | Subcategory,
+    level: number
+  ) => {
+    const currentCategoryInPath = categorySelectionPath[level];
+
+    let newPath;
+
+    // If the clicked category at the current level is already selected, deselect it and everything after.
+    if (currentCategoryInPath?.id === category.id) {
+      newPath = categorySelectionPath.slice(0, level);
+    } else {
+      // Otherwise, select it, replacing any previous selection at this level and after.
+      newPath = [...categorySelectionPath.slice(0, level), category];
+    }
+
+    setCategorySelectionPath(newPath);
+
+    // Update form data with the names from the new path
+    const newCategoryNames = newPath.map((c) => c.name);
+    setFormData((prev) => ({
+      ...prev,
+      categories: newCategoryNames,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -274,6 +368,9 @@ export default function ProductForm({
         ringSizes: formData.ringSizes,
         categories: formData.categories,
         tags: formData.tags,
+        details: formData.details
+          .split("\n")
+          .filter((line) => line.trim() !== ""),
       };
 
       if (isEditing && editingProductId) {
@@ -296,6 +393,7 @@ export default function ProductForm({
         ringSizes: [],
         categories: [],
         tags: [],
+        details: "",
       });
       setIsEditing(false);
       setEditingProductId(null);
@@ -340,6 +438,17 @@ export default function ProductForm({
               onChange={(e) => handleInputChange("description", e.target.value)}
               className="w-full min-h-[100px] p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+            />
+          </div>
+
+          {/* Product Details */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Product Details</label>
+            <textarea
+              placeholder="Enter product details, one per line..."
+              value={formData.details}
+              onChange={(e) => handleInputChange("details", e.target.value)}
+              className="w-full min-h-[120px] p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -537,65 +646,57 @@ export default function ProductForm({
           {/* Categories */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Categories</label>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Add category..."
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                onKeyPress={(e) =>
-                  e.key === "Enter" && (e.preventDefault(), addCategory())
-                }
-              />
-              <Button type="button" onClick={addCategory}>
-                <PlusIcon className="w-4 h-4" />
-              </Button>
+
+            {/* Hierarchical selection */}
+            <div className="space-y-4">
+              {[
+                availableCategories,
+                ...categorySelectionPath.map((c) => c.subcategories || []),
+              ].map(
+                (levelCategories, level) =>
+                  levelCategories.length > 0 && (
+                    <div
+                      key={level}
+                      className="space-y-2 p-3 border rounded-md bg-gray-50"
+                    >
+                      <p className="text-sm font-semibold text-gray-600">
+                        {level === 0
+                          ? "Select Main Category"
+                          : `Select Subcategory for "${
+                              categorySelectionPath[level - 1].name
+                            }"`}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {levelCategories.map((cat) => (
+                          <Badge
+                            key={cat.id}
+                            variant={
+                              categorySelectionPath[level]?.id === cat.id
+                                ? "default"
+                                : "secondary"
+                            }
+                            className="cursor-pointer text-base p-2"
+                            onClick={() => handleCategorySelect(cat, level)}
+                          >
+                            {cat.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )
+              )}
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {defaultCategories.map((category) => (
-                <Badge
-                  key={category}
-                  variant={
-                    formData.categories.includes(category)
-                      ? "default"
-                      : "secondary"
-                  }
-                  className="cursor-pointer"
-                  onClick={() => {
-                    if (formData.categories.includes(category)) {
-                      removeCategory(category);
-                    } else {
-                      setFormData((prev) => ({
-                        ...prev,
-                        categories: [...prev.categories, category],
-                      }));
-                    }
-                  }}
-                >
-                  {category}
-                </Badge>
-              ))}
-            </div>
+
+            {/* Selected Categories Path */}
             {formData.categories.length > 0 && (
               <div className="mt-2">
-                <p className="text-sm text-gray-600 mb-2">
-                  Selected categories:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {formData.categories.map((category) => (
-                    <Badge
-                      key={category}
-                      variant="default"
-                      className="cursor-pointer"
-                    >
-                      {category}
-                      <button
-                        type="button"
-                        onClick={() => removeCategory(category)}
-                        className="ml-2 hover:bg-red-600 rounded-full w-4 h-4 flex items-center justify-center"
-                      >
-                        <XIcon className="w-3 h-3" />
-                      </button>
-                    </Badge>
+                <p className="text-sm text-gray-600 mb-1">Selected Path:</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {formData.categories.map((category, index) => (
+                    <React.Fragment key={category}>
+                      {index > 0 && <span className="text-gray-400">›</span>}
+                      <Badge variant="outline">{category}</Badge>
+                    </React.Fragment>
                   ))}
                 </div>
               </div>
@@ -697,6 +798,7 @@ export default function ProductForm({
                   ringSizes: [],
                   categories: [],
                   tags: [],
+                  details: "",
                 });
                 setIsEditing(false);
                 setEditingProductId(null);

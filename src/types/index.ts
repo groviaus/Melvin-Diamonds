@@ -8,6 +8,7 @@ export interface Product {
   ringSizes: string[];
   categories: string[];
   tags: string[];
+  details: string[];
   createdAt: string;
   updatedAt: string;
 }
