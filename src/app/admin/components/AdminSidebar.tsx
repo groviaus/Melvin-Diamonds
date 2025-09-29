@@ -73,7 +73,7 @@ export default function AdminSidebar() {
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">M</span>
           </div>
-          <div className="font-semibold">Melvin Diamonds</div>
+          <div className="font-semibold">Maven Diamonds</div>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -100,7 +100,7 @@ export default function AdminSidebar() {
           <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
           <div>
             <div className="font-medium">Admin User</div>
-            <div className="text-xs">admin@melvindiamonds.com</div>
+            <div className="text-xs">admin@mavendiamonds.com</div>
           </div>
         </div>
       </SidebarFooter>

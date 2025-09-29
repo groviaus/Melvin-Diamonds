@@ -12,7 +12,7 @@ export default function GallerySection() {
           </h2>
           <p className="text-base sm:text-lg font-light text-gray-600 max-w-2xl mx-auto">
             Witness the intricate details and masterful techniques that make
-            each Melvin Diamond piece extraordinary
+            each Maven Diamonds piece extraordinary
           </p>
         </div>
 

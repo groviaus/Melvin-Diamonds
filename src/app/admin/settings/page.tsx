@@ -36,11 +36,11 @@ export default function SettingsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Store Name</label>
-                <Input defaultValue="Melvin Diamonds" />
+                <Input defaultValue="Maven Diamonds" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Store Email</label>
-                <Input defaultValue="admin@melvindiamonds.com" />
+                <Input defaultValue="admin@mavendiamonds.com" />
               </div>
             </div>
             <div className="space-y-2">
@@ -54,7 +54,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Website</label>
-                <Input defaultValue="https://melvindiamonds.com" />
+                <Input defaultValue="https://mavendiamonds.com" />
               </div>
             </div>
             <Button>Save Store Information</Button>

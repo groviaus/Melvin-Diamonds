@@ -21,9 +21,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Melvin Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
+  title: "Maven Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
   description:
-    "Melvin Diamonds offers the finest collection of diamond rings, gold jewelry, and engagement rings in Gorakhpur. Visit our showroom for personalized service and certified diamonds at competitive prices.",
+    "Maven Diamonds offers the finest collection of diamond rings, gold jewelry, and engagement rings in Gorakhpur. Visit our showroom for personalized service and certified diamonds at competitive prices.",
   keywords: [
     "diamond jewelry Gorakhpur",
     "gold jewelry store Gorakhpur",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     "gold earrings Gorakhpur",
     "bridal jewelry Gorakhpur",
     "luxury jewelry Gorakhpur",
-    "Melvin Diamonds",
+    "Maven Diamonds",
     "diamond shop Gorakhpur",
     "jewelry showroom Gorakhpur",
   ],
@@ -77,16 +77,16 @@ export const metadata: Metadata = {
   manifest: "/favicon_io/site.webmanifest",
   openGraph: {
     title:
-      "Melvin Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
+      "Maven Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
     description:
-      "Discover exquisite diamond rings, gold jewelry, and engagement rings at Melvin Diamonds in Gorakhpur. Personalized service and certified diamonds at competitive prices.",
+      "Discover exquisite diamond rings, gold jewelry, and engagement rings at Maven Diamonds in Gorakhpur. Personalized service and certified diamonds at competitive prices.",
   },
   twitter: {
     card: "summary_large_image",
     title:
-      "Melvin Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
+      "Maven Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
     description:
-      "Discover exquisite diamond rings, gold jewelry, and engagement rings at Melvin Diamonds in Gorakhpur. Personalized service and certified diamonds at competitive prices.",
+        "Discover exquisite diamond rings, gold jewelry, and engagement rings at Maven Diamonds in Gorakhpur. Personalized service and certified diamonds at competitive prices.",
   },
 };
 

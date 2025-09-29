@@ -1,6 +1,6 @@
 # Local Development Setup with Live APIs
 
-This document explains how to configure the Melvin Diamonds e-commerce project to use live APIs during local development.
+This document explains how to configure the Maven Diamonds e-commerce project to use live APIs during local development.
 
 ## Configuration Overview
 
