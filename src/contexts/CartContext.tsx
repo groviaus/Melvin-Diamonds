@@ -78,7 +78,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           {
             productId: product.id,
             title: product.title,
-            price: product.price,
+            price:
+              typeof product.price === "string"
+                ? parseFloat(product.price)
+                : Number(product.price),
             image: product.mainImage,
             size,
             quantity,
@@ -117,7 +120,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [items]
   );
   const subtotal = useMemo(
-    () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    () =>
+      items.reduce((sum, i) => {
+        const price =
+          typeof i.price === "string" ? parseFloat(i.price) : Number(i.price);
+        return sum + (isNaN(price) ? 0 : price) * i.quantity;
+      }, 0),
     [items]
   );
 

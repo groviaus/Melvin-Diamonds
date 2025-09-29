@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        
         source: "/api/:path*",
         headers: [
           { key: "Access-Control-Allow-Credentials", value: "true" },
@@ -27,6 +26,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "v0.dev" },
       { protocol: "https", hostname: "source.unsplash.com" },
+      { protocol: "https", hostname: "mavendiamonds.com" },
     ],
   },
 };

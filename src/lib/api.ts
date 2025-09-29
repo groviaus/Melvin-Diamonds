@@ -2,40 +2,89 @@ import { Product, CategoryData, Category, Subcategory } from "@/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
 
+// Get headers for API requests
+const getHeaders = () => {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+  return headers;
+};
+
+// Get fetch options with no-cache for live API calls
+const getFetchOptions = (
+  method: string = "GET",
+  body?: unknown
+): RequestInit => {
+  const options: RequestInit = {
+    method,
+    headers: getHeaders(),
+    cache: "no-store", // Disable caching for live data
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  return options;
+};
+
 // Product API functions
 export const productAPI = {
   // Get all products
   async getAll(): Promise<Product[]> {
-    const url = `${API_BASE}/products`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Failed to fetch products");
+    try {
+      const url = `${API_BASE}/products`;
+      console.log("Fetching products from:", url);
+      const response = await fetch(url, getFetchOptions("GET"));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Products API error:", response.status, errorText);
+        throw new Error(
+          `Failed to fetch products: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      console.log("Products fetched successfully:", data.products?.length || 0);
+      return data.products;
+    } catch (error) {
+      console.error("Products API error:", error);
+      throw error;
     }
-    const data = await response.json();
-    return data.products;
   },
 
   // Get product by ID
   async getById(id: string): Promise<Product> {
-    const response = await fetch(`${API_BASE}/products/${id}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch product");
+    try {
+      const url = `${API_BASE}/products/${id}`;
+      console.log("Fetching product from:", url);
+      const response = await fetch(url, getFetchOptions("GET"));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Product API error:", response.status, errorText);
+        throw new Error(
+          `Failed to fetch product: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      return data.product;
+    } catch (error) {
+      console.error("Product API error:", error);
+      throw error;
     }
-    const data = await response.json();
-    return data.product;
   },
 
   // Create new product
   async create(
     productData: Omit<Product, "id" | "createdAt" | "updatedAt">
   ): Promise<Product> {
-    const response = await fetch(`${API_BASE}/products`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
-    });
+    const response = await fetch(
+      `${API_BASE}/products`,
+      getFetchOptions("POST", productData)
+    );
     if (!response.ok) {
       throw new Error("Failed to create product");
     }
@@ -48,13 +97,10 @@ export const productAPI = {
     id: string,
     productData: Partial<Omit<Product, "id" | "createdAt" | "updatedAt">>
   ): Promise<Product> {
-    const response = await fetch(`${API_BASE}/products/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
-    });
+    const response = await fetch(
+      `${API_BASE}/products/${id}`,
+      getFetchOptions("PUT", productData)
+    );
     if (!response.ok) {
       throw new Error("Failed to update product");
     }
@@ -64,9 +110,10 @@ export const productAPI = {
 
   // Delete product
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/products/${id}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `${API_BASE}/products/${id}`,
+      getFetchOptions("DELETE")
+    );
     if (!response.ok) {
       throw new Error("Failed to delete product");
     }
@@ -80,8 +127,13 @@ export const uploadAPI = {
     const formData = new FormData();
     formData.append("file", file);
 
+    const headers = getHeaders();
+    // Remove Content-Type for FormData uploads
+    delete headers["Content-Type"];
+
     const response = await fetch(`${API_BASE}/upload`, {
       method: "POST",
+      headers,
       body: formData,
     });
 
@@ -106,11 +158,29 @@ export const uploadAPI = {
 export const categoryAPI = {
   // Get all categories
   async getAll(): Promise<CategoryData> {
-    const response = await fetch(`${API_BASE}/categories`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch categories");
+    try {
+      const url = `${API_BASE}/categories`;
+      console.log("Fetching categories from:", url);
+      const response = await fetch(url, getFetchOptions("GET"));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Categories API error:", response.status, errorText);
+        throw new Error(
+          `Failed to fetch categories: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      console.log(
+        "Categories fetched successfully:",
+        data.categories?.length || 0
+      );
+      return data;
+    } catch (error) {
+      console.error("Categories API error:", error);
+      throw error;
     }
-    return await response.json();
   },
 
   // Create new category or subcategory
@@ -118,13 +188,10 @@ export const categoryAPI = {
     name: string;
     parentId?: string;
   }): Promise<Category | Subcategory> {
-    const response = await fetch(`${API_BASE}/categories`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(
+      `${API_BASE}/categories`,
+      getFetchOptions("POST", data)
+    );
     if (!response.ok) {
       throw new Error("Failed to create category");
     }
@@ -134,13 +201,10 @@ export const categoryAPI = {
 
   // Update category or subcategory
   async update(id: string, name: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/categories`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id, name }),
-    });
+    const response = await fetch(
+      `${API_BASE}/categories`,
+      getFetchOptions("PUT", { id, name })
+    );
     if (!response.ok) {
       throw new Error("Failed to update category");
     }
@@ -148,9 +212,10 @@ export const categoryAPI = {
 
   // Delete category or subcategory
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/categories?id=${id}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `${API_BASE}/categories?id=${id}`,
+      getFetchOptions("DELETE")
+    );
     if (!response.ok) {
       throw new Error("Failed to delete category");
     }
