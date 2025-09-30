@@ -40,7 +40,8 @@ export default function LatestProducts() {
           
           <div key={p.id} className="group">
             <Link href={`/products/${p.id}`}>
-            <div className="aspect-square bg-gray-50 overflow-hidden">
+            <div className="aspect-[3/4]
+             bg-gray-50 overflow-hidden">
               <Image
                 src={resolveMediaUrl(p.mainImage)}
                 alt={p.title}
@@ -50,17 +51,13 @@ export default function LatestProducts() {
                 unoptimized
               />
             </div>
-            <div className="mt-2 text-sm text-muted-foreground">
-              {p.categories.join(", ")}
-            </div>
-            <div className="font-medium">{p.title}</div>
-            <div>${p.price}</div>
-            <Link
-              href={`/products/${p.id}`}
-              className="text-teal-700 text-sm mt-1 inline-block"
-            >
-              View
-            </Link>
+            {/* <div className="mt-2 text-sm text-muted-foreground">
+              {p.categories.join(" > ")}
+            </div> */}
+            <div className="font-medium mt-2">{p.title}</div>
+            <div className="">&#8377;{p.price}</div> 
+            {/* <div className="text-sm text-muted-foreground line-through">{1000}</div> */}
+            
             </Link>
           </div>
         ))}

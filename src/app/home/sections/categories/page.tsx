@@ -118,7 +118,7 @@ export default function Categories() {
   }, [apiCategories]);
 
   return (
-    <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 mx-auto">
+    <section className="pb-8 sm:pb-12 lg:pb-16 px-4 sm:px-6 lg:px-8 mx-auto">
       {/* Header Section */}
       <div className="sm:text-left text-center mb-8 sm:mb-10 lg:mb-12">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-gray-800 mb-2 sm:mb-3 lg:mb-4">
@@ -153,6 +153,7 @@ function CategoryCard({ category }: { category: Category }) {
         className={`aspect-[4/5] ${category.bgColor} mb-2 sm:mb-3 lg:mb-4 flex items-center justify-center overflow-hidden shadow-sm relative`}
       >
         {/* Main image */}
+        <Link href={`/category/${encodeURIComponent(category.name)}`}>
         <Image
           src={category.image}
           alt={category.name}
@@ -178,6 +179,7 @@ function CategoryCard({ category }: { category: Category }) {
             draggable={false}
           />
         </motion.div>
+        </Link>
       </div>
 
       {/* Category Label */}
