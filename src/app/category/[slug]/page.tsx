@@ -6,6 +6,7 @@ import Image from "next/image";
 import { productAPI } from "@/lib/api";
 import { Product } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -44,7 +45,8 @@ export default function CategoryPage() {
       ) : (
         <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filtered.map((product) => (
-            <Card key={product.id}>
+            <Card key={product.id} className="rounded-none py-0">
+              <Link href={`/products/${product.id}`}>
               <div className="aspect-square bg-gray-50">
                 {product.mainImage && (
                   <Image
@@ -64,6 +66,7 @@ export default function CategoryPage() {
                 <div className="font-medium mt-1">{product.title}</div>
                 <div className="mt-1">${product.price}</div>
               </CardContent>
+              </Link>
             </Card>
           ))}
         </div>

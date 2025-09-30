@@ -37,7 +37,9 @@ export default function LatestProducts() {
 
       <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
         {items.map((p) => (
+          
           <div key={p.id} className="group">
+            <Link href={`/products/${p.id}`}>
             <div className="aspect-square bg-gray-50 overflow-hidden">
               <Image
                 src={resolveMediaUrl(p.mainImage)}
@@ -58,6 +60,7 @@ export default function LatestProducts() {
               className="text-teal-700 text-sm mt-1 inline-block"
             >
               View
+            </Link>
             </Link>
           </div>
         ))}

@@ -115,7 +115,7 @@ export default function Footer() {
         </div>
         {/* Footer Bottom */}
         <div className="border-t mt-8 sm:mt-10 lg:mt-12 pt-4 sm:pt-6 text-xs text-white flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>©2025 Mevlin Diamonds</span>
+          <span>©2025 Maven Diamonds</span>
           <div className="flex flex-wrap gap-2 sm:gap-3">
             <a href="#" className="hover:text-white/80">
               Terms & Conditions
