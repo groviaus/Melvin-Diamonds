@@ -7,7 +7,7 @@ import Link from "next/link";
 import { productAPI } from "@/lib/api";
 import { Product } from "@/types";
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/contexts/CartContext";
+import { useCartStore } from "@/stores/cartStore";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Loader2Icon,
@@ -28,7 +28,7 @@ export default function ProductDetailClient() {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
-  const { addItem } = useCart();
+  const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
     if (!params?.id) return;

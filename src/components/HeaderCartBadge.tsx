@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
+import { useCartStore } from "@/stores/cartStore";
 
 export default function HeaderCartBadge() {
-  const { totalQuantity } = useCart();
+  const totalQuantity = useCartStore((state) => state.totalQuantity());
   return (
     <Link href="/cart" className="relative">
       <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer" />

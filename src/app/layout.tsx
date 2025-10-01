@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import ConditionalLayout from "../components/ConditionalLayout";
-import { CartProvider } from "@/contexts/CartContext";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -76,17 +75,15 @@ export const metadata: Metadata = {
   },
   manifest: "/favicon_io/site.webmanifest",
   openGraph: {
-    title:
-      "Maven Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
+    title: "Maven Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
     description:
       "Discover exquisite diamond rings, gold jewelry, and engagement rings at Maven Diamonds in Gorakhpur. Personalized service and certified diamonds at competitive prices.",
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "Maven Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
+    title: "Maven Diamonds - Premium Diamond & Gold Jewelry Store in Gorakhpur",
     description:
-        "Discover exquisite diamond rings, gold jewelry, and engagement rings at Maven Diamonds in Gorakhpur. Personalized service and certified diamonds at competitive prices.",
+      "Discover exquisite diamond rings, gold jewelry, and engagement rings at Maven Diamonds in Gorakhpur. Personalized service and certified diamonds at competitive prices.",
   },
 };
 
@@ -98,9 +95,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} font-playfair antialiased`}>
-        <CartProvider>
-          <ConditionalLayout>{children}</ConditionalLayout>
-        </CartProvider>
+        <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
   );

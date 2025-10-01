@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "@/contexts/CartContext";
+import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,7 +22,11 @@ import {
 import { resolveMediaUrl } from "@/lib/utils";
 
 export default function CheckoutPage() {
-  const { items, subtotal, updateQuantity, removeItem, clear } = useCart();
+  const items = useCartStore((state) => state.items);
+  const subtotal = useCartStore((state) => state.subtotal());
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const removeItem = useCartStore((state) => state.removeItem);
+  const clear = useCartStore((state) => state.clear);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Form states
