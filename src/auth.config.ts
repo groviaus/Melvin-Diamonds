@@ -34,6 +34,7 @@ export const authConfig: NextAuthConfig = {
             name: string;
             password: string;
             image?: string;
+            role?: string;
           };
 
           if (!user || !user.password) {
@@ -54,6 +55,7 @@ export const authConfig: NextAuthConfig = {
             email: user.email,
             name: user.name,
             image: user.image,
+            role: user.role,
           };
         } catch (error) {
           // If database is unavailable (like billing issue), return null
@@ -80,15 +82,24 @@ export const authConfig: NextAuthConfig = {
           const users = rows as unknown[];
 
           if ((users as unknown[]).length === 0) {
-            // Create new user
+            // Create new user with default 'user' role
             const userId = `google-${Date.now()}`;
             await pool.query(
-              "INSERT INTO users (id, name, email, image, provider, emailVerified) VALUES (?, ?, ?, ?, 'google', NOW())",
+              "INSERT INTO users (id, name, email, image, provider, emailVerified, role) VALUES (?, ?, ?, ?, 'google', NOW(), 'user')",
               [userId, user.name, user.email, user.image]
             );
             user.id = userId;
+            user.role = "user";
           } else {
-            user.id = (users[0] as { id: string }).id;
+            const existingUser = users[0] as {
+              id: string;
+              email: string;
+              name: string;
+              image?: string;
+              role?: string;
+            };
+            user.id = existingUser.id;
+            user.role = existingUser.role || "user";
           }
 
           return true;

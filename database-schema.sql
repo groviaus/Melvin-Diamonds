@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   password VARCHAR(255), -- hashed password for credentials login
   image VARCHAR(512),
   provider VARCHAR(50) DEFAULT 'credentials', -- 'credentials', 'google', etc.
+  role VARCHAR(50) DEFAULT 'user', -- 'user', 'admin', 'super_admin'
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
