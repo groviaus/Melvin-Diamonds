@@ -6,10 +6,12 @@ import pool from "@/lib/db";
 
 export const authConfig: NextAuthConfig = {
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ?
+      [Google({
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      })] : []
+    ),
     Credentials({
       name: "credentials",
       credentials: {
@@ -22,6 +24,9 @@ export const authConfig: NextAuthConfig = {
         }
 
         try {
+          // Check if database is available first
+          await pool.query("SELECT 1");
+
           const [rows] = await pool.query(
             "SELECT * FROM users WHERE email = ? AND provider = 'credentials'",
             [credentials.email]
@@ -58,9 +63,8 @@ export const authConfig: NextAuthConfig = {
             role: user.role,
           };
         } catch (error) {
-          // If database is unavailable (like billing issue), return null
-          // This prevents the auth system from crashing
-          console.error("Auth error:", error);
+          // If database is unavailable, return null instead of crashing
+          console.error("Database unavailable during auth:", error);
           return null;
         }
       },
