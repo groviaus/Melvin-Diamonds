@@ -76,7 +76,7 @@ export default function SignUpPage() {
 
       router.push("/");
       router.refresh();
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again.");
       setIsLoading(false);
     }

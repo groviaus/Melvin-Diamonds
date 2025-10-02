@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -8,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -179,12 +179,14 @@ export default function CustomersPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
                         {customer.image ? (
-                          <img
+                          <Image
                             src={customer.image}
                             alt={customer.name}
-                            className="w-10 h-10 rounded-full"
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
                           <UserIcon className="w-5 h-5 text-blue-600" />

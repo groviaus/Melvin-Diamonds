@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       [email]
     );
 
-    if ((existingUsers as any[]).length > 0) {
+    if (Array.isArray(existingUsers) && existingUsers.length > 0) {
       return NextResponse.json(
         { error: "User with this email already exists" },
         { status: 400 }
