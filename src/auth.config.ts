@@ -16,6 +16,7 @@ interface UserFromDb {
 }
 
 export const authConfig: NextAuthConfig = {
+  trustHost: true,
   providers: [
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? [
@@ -32,59 +33,39 @@ export const authConfig: NextAuthConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log(
-          `[AUTH] Authorize function started for email: ${credentials?.email}`
-        );
-
         if (!credentials?.email || !credentials?.password) {
-          console.log("[AUTH] Missing email or password.");
           return null;
         }
 
         try {
-          console.log("[AUTH] Attempting database query for user...");
+          // Check if database is available first
+          await pool.query("SELECT 1");
+
           const [rows] = await pool.query(
             "SELECT * FROM users WHERE email = ? AND provider = 'credentials'",
             [credentials.email]
           );
-          console.log("[AUTH] Database query completed.");
 
           const users = rows as UserFromDb[];
           if (users.length === 0) {
-            console.log(
-              `[AUTH] No user found with email: ${credentials.email}`
-            );
             return null;
           }
 
           const user = users[0];
-          console.log(
-            `[AUTH] User found: { id: ${user.id}, email: ${user.email}, role: ${user.role} }`
-          );
 
           if (!user.password) {
-            console.log(
-              "[AUTH] User found, but has no password set (e.g., social login account)."
-            );
             return null;
           }
 
-          console.log("[AUTH] Comparing passwords...");
           const passwordsMatch = await bcrypt.compare(
             credentials.password as string,
             user.password
           );
 
           if (!passwordsMatch) {
-            console.log(
-              "[AUTH] Password comparison failed. Passwords do not match."
-            );
             return null;
           }
 
-          console.log(
-            "[AUTH] Password comparison successful. Authorizing user."
-          );
           return {
             id: user.id,
             email: user.email,
@@ -93,7 +74,8 @@ export const authConfig: NextAuthConfig = {
             role: user.role,
           };
         } catch (error) {
-          console.error("[AUTH] CRITICAL ERROR in authorize function:", error);
+          // If database is unavailable, return null instead of crashing
+          console.error("Database unavailable during auth:", error);
           return null;
         }
       },

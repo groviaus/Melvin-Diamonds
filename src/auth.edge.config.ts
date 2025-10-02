@@ -3,6 +3,7 @@ import type { NextAuthConfig } from "next-auth";
 // Edge-compatible auth config (no database access)
 // This is used by middleware which runs in Edge Runtime
 export const authEdgeConfig: NextAuthConfig = {
+  trustHost: true,
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
