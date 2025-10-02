@@ -34,11 +34,7 @@ export const authConfig: NextAuthConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log(
-          `[AUTH_TRACE] Authorize started for: ${credentials?.email}`
-        );
         if (!credentials?.email || !credentials?.password) {
-          console.log(`[AUTH_TRACE] Authorize failed: Missing credentials.`);
           return null;
         }
 
@@ -51,14 +47,10 @@ export const authConfig: NextAuthConfig = {
           const user = rows[0] as UserFromDb | undefined;
 
           if (!user) {
-            console.log(`[AUTH_TRACE] Authorize failed: User not found.`);
             return null;
           }
 
           if (!user.password) {
-            console.log(
-              `[AUTH_TRACE] Authorize failed: User has no password set.`
-            );
             return null;
           }
 
@@ -68,15 +60,9 @@ export const authConfig: NextAuthConfig = {
           );
 
           if (!passwordsMatch) {
-            console.log(
-              `[AUTH_TRACE] Authorize failed: Passwords do not match.`
-            );
             return null;
           }
 
-          console.log(
-            `[AUTH_TRACE] Authorize successful for user: ${user.email}`
-          );
           return {
             id: user.id,
             email: user.email,
@@ -85,7 +71,7 @@ export const authConfig: NextAuthConfig = {
             role: user.role,
           };
         } catch (error) {
-          console.error("[AUTH_TRACE] CRITICAL ERROR in authorize:", error);
+          console.error("[AUTH] CRITICAL ERROR in authorize:", error);
           return null;
         }
       },
