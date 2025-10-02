@@ -4,6 +4,17 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import pool from "@/lib/db";
 
+interface UserFromDb {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  provider: "google" | "credentials";
+  emailVerified: Date | null;
+  role: "user" | "admin";
+  password?: string | null;
+}
+
 export const authConfig: NextAuthConfig = {
   providers: [
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
@@ -38,7 +49,7 @@ export const authConfig: NextAuthConfig = {
           );
           console.log("[AUTH] Database query completed.");
 
-          const users = rows as any[];
+          const users = rows as UserFromDb[];
           if (users.length === 0) {
             console.log(
               `[AUTH] No user found with email: ${credentials.email}`
@@ -101,9 +112,9 @@ export const authConfig: NextAuthConfig = {
             "SELECT * FROM users WHERE email = ?",
             [user.email]
           );
-          const users = rows as unknown[];
+          const users = rows as UserFromDb[];
 
-          if ((users as unknown[]).length === 0) {
+          if (users.length === 0) {
             // Create new user with default 'user' role
             const userId = `google-${Date.now()}`;
             await pool.query(
@@ -113,13 +124,7 @@ export const authConfig: NextAuthConfig = {
             user.id = userId;
             user.role = "user";
           } else {
-            const existingUser = users[0] as {
-              id: string;
-              email: string;
-              name: string;
-              image?: string;
-              role?: string;
-            };
+            const existingUser = users[0];
             user.id = existingUser.id;
             user.role = existingUser.role || "user";
           }
