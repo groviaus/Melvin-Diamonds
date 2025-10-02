@@ -10,9 +10,13 @@ export async function GET() {
     await connection.query("SELECT 1");
     connection.release();
     dbConnectionStatus = "✅ Connection successful";
-  } catch (error: any) {
+  } catch (error) {
     dbConnectionStatus = "❌ Connection failed";
-    dbError = error.message;
+    if (error instanceof Error) {
+      dbError = error.message;
+    } else {
+      dbError = "An unknown error occurred";
+    }
   }
 
   const envVars = {
