@@ -1,6 +1,9 @@
 import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
-import "dotenv/config";
+import dotenv from "dotenv";
+
+// Load environment variables from .env.production
+dotenv.config({ path: ".env.production" });
 
 // --- START OF CONFIGURATION ---
 
