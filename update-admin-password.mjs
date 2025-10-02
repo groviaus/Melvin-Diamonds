@@ -50,14 +50,14 @@ async function updateAdminPassword() {
       [adminEmail]
     );
 
-    const users = rows as any[];
-    if (users.length === 0) {
+    const users = rows;
+    if ((users as any[]).length === 0) {
       console.error(`❌ Error: No user found with the email "${adminEmail}".`);
       connection.release();
       return;
     }
 
-    const user = users[0];
+    const user = (users as any[])[0];
     console.log(`✅ User found: { id: ${user.id}, email: ${user.email} }`);
 
     console.log("\nGenerating secure password hash...");
