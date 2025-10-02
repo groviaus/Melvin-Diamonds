@@ -19,6 +19,7 @@ import { Loader2Icon } from "lucide-react";
 export default function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const from = searchParams.get("from");
 
   const [email, setEmail] = useState("");
@@ -36,6 +37,7 @@ export default function SignInForm() {
         email,
         password,
         redirect: false,
+        callbackUrl,
       });
 
       if (result?.error) {
@@ -44,15 +46,8 @@ export default function SignInForm() {
         return;
       }
 
-      // Redirect to intended page or home
-      if (from === "checkout") {
-        router.push("/checkout");
-      } else if (from === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/");
-      }
-      router.refresh();
+      // Use replace to avoid polluting history
+      router.replace(callbackUrl);
     } catch {
       setError("Something went wrong. Please try again.");
       setIsLoading(false);
