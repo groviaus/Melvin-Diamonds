@@ -42,14 +42,13 @@ export default function SignInForm() {
 
       if (result?.error) {
         setError("Invalid email or password");
-        setIsLoading(false);
         return;
       }
 
-      // Use replace to avoid polluting history
       router.replace(callbackUrl);
-    } catch {
+    } catch (error) {
       setError("Something went wrong. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
