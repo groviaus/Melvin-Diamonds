@@ -25,29 +25,34 @@ export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [formError, setFormError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setFormError("");
     setIsLoading(true);
 
     try {
       const result = await signIn("credentials", {
+        redirect: false,
         email,
         password,
-        redirect: false,
-        callbackUrl,
+        callbackUrl: callbackUrl,
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setFormError("Invalid email or password. Please try again.");
         return;
       }
 
       router.replace(callbackUrl);
-    } catch (error) {
-      setError("Something went wrong. Please try again.");
+    } catch (authError) {
+      const error = authError as Error & { type?: string };
+      if (error.type === "CredentialsSignin") {
+        setFormError("Invalid email or password. Please try again.");
+      } else {
+        setFormError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -71,9 +76,12 @@ export default function SignInForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-            {error}
+        {formError && (
+          <div
+            className="bg-destructive/10 text-destructive border border-destructive/20 p-3 rounded-md text-sm"
+            role="alert"
+          >
+            {formError}
           </div>
         )}
 

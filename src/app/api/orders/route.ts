@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       const orderId = uuidv4();
       const orderNumber = `${Date.now()}-${userId.slice(-4)}`;
 
-      const [orderResult] = await connection.query(
+      await connection.query(
         `INSERT INTO orders (id, userId, orderNumber, customerName, customerEmail, customerPhone, shippingFirstName, shippingLastName, shippingAddress, shippingApartment, shippingCity, shippingState, shippingZipCode, subtotal, shippingCost, tax, total, paymentMethod, paymentStatus, status)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
