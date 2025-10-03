@@ -2,7 +2,6 @@ import "@/app/globals.css";
 import { Inter } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import ConditionalLayout from "@/components/ConditionalLayout";
-import { Header } from "@/components/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,10 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider>
-          <ConditionalLayout>
-            <Header />
-            {children}
-          </ConditionalLayout>
+          <ConditionalLayout>{children}</ConditionalLayout>
         </SessionProvider>
       </body>
     </html>

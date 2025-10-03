@@ -1,9 +1,43 @@
-import { Search, User, Heart, Phone, Calendar, Menu } from "lucide-react";
+"use client";
+
+import {
+  Search,
+  User,
+  Heart,
+  Phone,
+  Calendar,
+  Menu,
+  LogOut,
+  LayoutDashboard,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import HeaderCartBadge from "@/components/HeaderCartBadge";
+import { useSession, signOut } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Header() {
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
+
+  const getInitials = (name?: string | null) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("");
+  };
+
   return (
     <>
       {/* Promotional Banner */}
@@ -62,7 +96,87 @@ export default function Header() {
             {/* Right - User Actions */}
             <div className="flex items-center space-x-3 sm:space-x-4 lg:space-x-6">
               <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer " />
-              <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer hidden sm:block" />
+
+              {status === "loading" && (
+                <div className="h-8 w-8 animate-pulse rounded-full bg-muted hidden sm:block"></div>
+              )}
+
+              {status !== "loading" && (
+                <div className="hidden sm:block">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="relative h-8 w-8 rounded-full"
+                      >
+                        {status === "authenticated" && user ? (
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src={user.image || undefined}
+                              alt={user.name || "User"}
+                            />
+                            <AvatarFallback>
+                              {getInitials(user.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <User className="min-h-5 min-w-5 text-gray-600" />
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-56 rounded-none"
+                      align="end"
+                      forceMount
+                    >
+                      {status === "authenticated" && user ? (
+                        <>
+                          <DropdownMenuLabel className="font-normal">
+                            <div className="flex flex-col space-y-1">
+                              <p className="text-sm font-medium leading-none">
+                                Hello, {user.name}
+                              </p>
+                              <p className="text-xs leading-none text-muted-foreground">
+                                {user.email}
+                              </p>
+                            </div>
+                          </DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem asChild>
+                            <Link href="/profile">
+                              <User className="mr-2 h-4 w-4" />
+                              <span>My Profile</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          {isAdmin && (
+                            <DropdownMenuItem asChild>
+                              <Link href="/admin">
+                                <LayoutDashboard className="mr-2 h-4 w-4" />
+                                <span>Admin Dashboard</span>
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => signOut()}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Log out</span>
+                          </DropdownMenuItem>
+                        </>
+                      ) : (
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href="/auth/signin"
+                            className="w-full justify-center"
+                          >
+                            Sign In
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer hidden sm:block" />
               <HeaderCartBadge />
               <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer sm:hidden" />
