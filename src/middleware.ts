@@ -1,43 +1,45 @@
-import NextAuth from "next-auth";
-import { authEdgeConfig } from "./auth.edge.config";
+import { NextResponse, type NextRequest } from "next/server";
+import { auth } from "./auth";
 
-export const { auth: middleware } = NextAuth({
-  ...authEdgeConfig,
-  callbacks: {
-    ...authEdgeConfig.callbacks,
-    async authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const userRole = auth?.user?.role;
-      const isAdmin = userRole === "admin" || userRole === "super_admin";
+export async function middleware(request: NextRequest) {
+  const session = await auth();
+  const { nextUrl } = request;
 
-      const isOnAdmin = nextUrl.pathname.startsWith("/admin");
-      const isOnCheckout = nextUrl.pathname === "/checkout";
-      const isOnProfile = nextUrl.pathname.startsWith("/profile");
-      const isOnOrders = nextUrl.pathname.startsWith("/orders");
+  const isLoggedIn = !!session?.user;
+  const userRole = session?.user?.role;
+  const isAdmin = userRole === "admin" || userRole === "super_admin";
 
-      // Admin routes require admin role
-      if (isOnAdmin) {
-        if (!isLoggedIn) {
-          return false; // Redirect to signin
-        }
-        if (!isAdmin) {
-          return false; // Redirect to signin (insufficient permissions)
-        }
-        return true;
-      }
+  const isOnAdminPath = nextUrl.pathname.startsWith("/admin");
+  const protectedUserPaths = ["/checkout", "/profile", "/orders"];
+  const isOnUserPath = protectedUserPaths.some((path) =>
+    nextUrl.pathname.startsWith(path)
+  );
 
-      // User-specific routes require authentication
-      if (isOnCheckout || isOnProfile || isOnOrders) {
-        if (isLoggedIn) return true;
-        return false; // Redirect to signin
-      }
+  // Protect admin routes
+  if (isOnAdminPath) {
+    if (!isLoggedIn) {
+      // Redirect unauthenticated users to the sign-in page, saving the original URL
+      const loginUrl = new URL("/auth/signin", nextUrl.origin);
+      loginUrl.searchParams.set("callbackUrl", nextUrl.href);
+      return NextResponse.redirect(loginUrl);
+    }
+    if (!isAdmin) {
+      // Redirect non-admins to the homepage
+      return NextResponse.redirect(new URL("/", nextUrl.origin));
+    }
+  }
 
-      return true;
-    },
-  },
-});
+  // Protect standard user routes
+  if (isOnUserPath) {
+    if (!isLoggedIn) {
+      const loginUrl = new URL("/auth/signin", nextUrl.origin);
+      loginUrl.searchParams.set("callbackUrl", nextUrl.href);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
 
-export default middleware;
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: ["/admin/:path*", "/checkout", "/profile/:path*", "/orders/:path*"],
