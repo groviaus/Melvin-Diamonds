@@ -22,15 +22,18 @@ import {
 
 interface Address {
   id: string;
-  fullName: string;
-  phone: string;
-  addressLine1: string;
-  addressLine2: string | null;
+  userId: string;
+  isDefault: boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  address: string;
+  apartment: string | null;
   city: string;
   state: string;
-  postalCode: string;
+  zipCode: string;
   country: string;
-  isDefault: boolean;
 }
 
 interface Customer {
@@ -235,7 +238,7 @@ export default function CustomersPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <span className="font-medium">
-                                {address.fullName}
+                                {address.firstName} {address.lastName}
                               </span>
                               {address.isDefault && (
                                 <Badge variant="default" className="text-xs">
@@ -244,17 +247,20 @@ export default function CustomersPage() {
                               )}
                             </div>
                             <p className="text-muted-foreground">
-                              {address.addressLine1}
-                              {address.addressLine2 &&
-                                `, ${address.addressLine2}`}
+                              {address.address}
+                              {address.apartment && `, ${address.apartment}`}
                             </p>
                             <p className="text-muted-foreground">
-                              {address.city}, {address.state}{" "}
-                              {address.postalCode}
+                              {address.city}, {address.state} {address.zipCode}
                             </p>
                             <p className="text-muted-foreground">
-                              Phone: {address.phone}
+                              {address.country}
                             </p>
+                            {address.phone && (
+                              <p className="text-muted-foreground">
+                                Phone: {address.phone}
+                              </p>
+                            )}
                           </div>
                         </div>
                       ))}

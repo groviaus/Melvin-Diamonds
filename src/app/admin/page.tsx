@@ -15,7 +15,7 @@ interface RecentOrder {
   id: string;
   customerName: string;
   total: number;
-  status: "pending" | "completed";
+  status: string;
   createdAt: string;
 }
 
@@ -160,9 +160,11 @@ export default async function AdminDashboard() {
                     </div>
                     <Badge
                       className={`capitalize text-xs ${
-                        order.status === "completed"
+                        order.status === "delivered"
                           ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
+                          : order.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {order.status}

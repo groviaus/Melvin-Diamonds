@@ -34,7 +34,7 @@ interface Order {
   userId: string;
   userName: string;
   userEmail: string;
-  totalAmount: number;
+  total: number;
   status: string;
   paymentStatus: string;
   paymentMethod: string;
@@ -226,7 +226,7 @@ export default function OrdersPage() {
                       <div className="flex items-center space-x-4">
                         <div className="text-right">
                           <p className="font-medium">
-                            {formatCurrency(order.totalAmount)}
+                            {formatCurrency(order.total)}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {new Date(order.createdAt).toLocaleString()}

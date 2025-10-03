@@ -43,17 +43,17 @@ export async function GET() {
     // Get top selling products
     const [topProducts] = await pool.query<RowDataPacket[]>(
       `SELECT 
-        p.name,
-        COUNT(oi.id) as salesCount,
-        SUM(oi.quantity) as totalQuantity,
-        SUM(oi.quantity * oi.price) as revenue
+        p.id,
+        p.title,
+        p.mainImage as image,
+        SUM(oi.quantity) as sales
       FROM order_items oi
       JOIN products p ON oi.productId = p.id
       JOIN orders o ON oi.orderId = o.id
       WHERE o.paymentStatus = 'paid'
-      GROUP BY p.id, p.name
-      ORDER BY salesCount DESC
-      LIMIT 4`
+      GROUP BY p.id, p.title, p.mainImage
+      ORDER BY sales DESC
+      LIMIT 5`
     );
 
     return NextResponse.json({
@@ -69,15 +69,15 @@ export async function GET() {
       recentOrders: recentOrders.map((order) => ({
         id: order.id,
         customerName: order.customerName || "N/A",
-        totalAmount: Number(order.totalAmount),
+        total: Number(order.totalAmount),
         status: order.status,
         createdAt: order.createdAt,
       })),
       topProducts: topProducts.map((product) => ({
-        name: product.name,
-        salesCount: Number(product.salesCount),
-        totalQuantity: Number(product.totalQuantity),
-        revenue: Number(product.revenue),
+        id: product.id,
+        title: product.title,
+        image: product.image || "/placeholder.svg",
+        sales: Number(product.sales),
       })),
     });
   } catch (error) {

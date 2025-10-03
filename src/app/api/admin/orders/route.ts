@@ -7,7 +7,7 @@ interface OrderRow extends RowDataPacket {
   userId: string;
   userName: string;
   userEmail: string;
-  totalAmount: number;
+  total: number;
   status: string;
   paymentStatus: string;
   paymentMethod: string;
@@ -35,7 +35,7 @@ export async function GET() {
         o.userId,
         u.name as userName,
         u.email as userEmail,
-        o.totalAmount,
+        o.total,
         o.status,
         o.paymentStatus,
         o.paymentMethod,
@@ -55,7 +55,7 @@ export async function GET() {
       `SELECT 
         oi.orderId,
         oi.productId,
-        oi.productName,
+        oi.productTitle as productName,
         oi.productDescription,
         oi.quantity,
         oi.price
@@ -95,7 +95,7 @@ export async function GET() {
       userId: order.userId,
       userName: order.userName || "N/A",
       userEmail: order.userEmail,
-      totalAmount: Number(order.totalAmount),
+      total: Number(order.total),
       status: order.status,
       paymentStatus: order.paymentStatus,
       paymentMethod: order.paymentMethod,

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation"; // Import useRouter
 import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,7 @@ export default function CheckoutPage() {
   const removeItem = useCartStore((state) => state.removeItem);
   const clear = useCartStore((state) => state.clear);
   const [isProcessing, setIsProcessing] = useState(false);
+  const router = useRouter(); // Initialize router
 
   // Form states
   const [shippingInfo, setShippingInfo] = useState({
@@ -62,9 +64,9 @@ export default function CheckoutPage() {
   });
 
   const disabled = items.length === 0;
-  const shipping = subtotal > 100 ? 0 : 9.99;
+  const shippingCost = subtotal > 100 ? 0 : 9.99; // Renamed for clarity
   const tax = subtotal * 0.08; // 8% tax
-  const total = subtotal + shipping + tax;
+  const total = subtotal + shippingCost + tax;
 
   // Helper function to ensure price is a number
   const formatPrice = (price: number | string): string => {
@@ -75,16 +77,44 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (disabled) return;
     setIsProcessing(true);
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          shippingInfo,
+          items,
+          subtotal,
+          shippingCost,
+          tax,
+          total,
+        }),
+      });
 
-    // Clear cart and redirect to success page
-    clear();
-    // In a real app, you'd redirect to a success page
-    alert("Order placed successfully!");
-    setIsProcessing(false);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to place order.");
+      }
+
+      // Clear cart and redirect to a success page
+      clear();
+      // For now, an alert and redirect to home. A dedicated success page is better.
+      alert(`Order placed successfully! Order Number: ${result.orderNumber}`);
+      router.push("/"); // Redirect to homepage
+    } catch (error) {
+      console.error("Checkout error:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred.";
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (disabled) {
@@ -491,7 +521,9 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-sm">
                     <span>Shipping</span>
                     <span className="font-medium">
-                      {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                      {shippingCost === 0
+                        ? "Free"
+                        : `$${shippingCost.toFixed(2)}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">

@@ -47,7 +47,7 @@ export async function GET() {
 
     // Get addresses for all users
     const [addresses] = await pool.query<AddressRow[]>(
-      `SELECT * FROM addresses ORDER BY isDefault DESC`
+      `SELECT * FROM addresses ORDER BY userId, isDefault DESC`
     );
 
     // Group addresses by userId
