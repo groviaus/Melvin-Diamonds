@@ -38,10 +38,10 @@ export async function GET() {
         u.provider,
         u.createdAt,
         COUNT(DISTINCT o.id) as orderCount,
-        COALESCE(SUM(o.totalAmount), 0) as totalSpent
+        COALESCE(SUM(o.total), 0) as totalSpent
       FROM users u
       LEFT JOIN orders o ON u.id = o.userId
-      GROUP BY u.id
+      GROUP BY u.id, u.name, u.email, u.image, u.provider, u.createdAt
       ORDER BY u.createdAt DESC`
     );
 

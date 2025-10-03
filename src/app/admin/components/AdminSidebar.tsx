@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +24,7 @@ import {
   BarChart3Icon,
   ShoppingCartIcon,
   FolderIcon,
+  LogOutIcon,
 } from "lucide-react";
 
 const sidebarNavItems = [
@@ -95,14 +97,15 @@ export default function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="border-t px-6 py-4">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-          <div>
-            <div className="font-medium">Admin User</div>
-            <div className="text-xs">admin@mavendiamonds.com</div>
-          </div>
-        </div>
+      <SidebarFooter className="border-t p-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={() => signOut({ callbackUrl: "/" })}>
+              <LogOutIcon className="w-4 h-4" />
+              Logout
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
       <SidebarTrigger />
     </Sidebar>

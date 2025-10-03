@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
     if (!isLoggedIn) {
       // Redirect unauthenticated users to the sign-in page, saving the original URL
       const loginUrl = new URL("/auth/signin", nextUrl.origin);
-      loginUrl.searchParams.set("callbackUrl", nextUrl.href);
+      loginUrl.searchParams.set("callbackUrl", nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }
     if (!isAdmin) {
@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
   if (isOnUserPath) {
     if (!isLoggedIn) {
       const loginUrl = new URL("/auth/signin", nextUrl.origin);
-      loginUrl.searchParams.set("callbackUrl", nextUrl.href);
+      loginUrl.searchParams.set("callbackUrl", nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }
   }
