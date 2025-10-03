@@ -120,7 +120,7 @@ export default function Header() {
                             </AvatarFallback>
                           </Avatar>
                         ) : (
-                          <User className="min-h-5 min-w-5 text-gray-600" />
+                          <User className="min-h-5 min-w-5 text-gray-600 " />
                         )}
                       </Button>
                     </DropdownMenuTrigger>
