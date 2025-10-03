@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import pool from "@/lib/db";
+import { ResultSetHeader } from "mysql2";
 
 export async function PUT(req: Request) {
   const session = await auth();
@@ -21,9 +22,7 @@ export async function PUT(req: Request) {
       [name.trim(), session.user.id]
     );
 
-    // The result from a successful UPDATE query in mysql2 has an `affectedRows` property.
-    // We can check this to ensure the update actually happened.
-    const updateResult = result as any;
+    const updateResult = result as ResultSetHeader;
     if (updateResult.affectedRows === 0) {
       return NextResponse.json(
         { error: "User not found or name is the same." },
