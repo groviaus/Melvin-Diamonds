@@ -19,7 +19,7 @@ export async function GET() {
         (SELECT COUNT(*) FROM products) as totalProducts,
         (SELECT COUNT(*) FROM orders) as totalOrders,
         (SELECT COUNT(*) FROM users) as totalCustomers,
-        (SELECT COALESCE(SUM(totalAmount), 0) FROM orders WHERE paymentStatus = 'paid') as totalRevenue,
+        (SELECT COALESCE(SUM(total), 0) FROM orders WHERE paymentStatus = 'paid') as totalRevenue,
         (SELECT COUNT(*) FROM orders WHERE status = 'pending') as pendingOrders,
         (SELECT COUNT(*) FROM orders WHERE status = 'delivered') as completedOrders`
     );
@@ -31,7 +31,7 @@ export async function GET() {
       `SELECT 
         o.id,
         u.name as customerName,
-        o.totalAmount,
+        o.total,
         o.status,
         o.createdAt
       FROM orders o
@@ -69,7 +69,7 @@ export async function GET() {
       recentOrders: recentOrders.map((order) => ({
         id: order.id,
         customerName: order.customerName || "N/A",
-        total: Number(order.totalAmount),
+        total: Number(order.total),
         status: order.status,
         createdAt: order.createdAt,
       })),

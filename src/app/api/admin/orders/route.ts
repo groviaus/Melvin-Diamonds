@@ -15,6 +15,12 @@ interface OrderRow extends RowDataPacket {
   createdAt: Date;
   updatedAt: Date;
   itemCount: number;
+  shippingAddress: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingZipCode: string;
+  shippingCountry: string;
+  customerPhone: string | null;
 }
 
 interface OrderItemRow extends RowDataPacket {
@@ -42,6 +48,12 @@ export async function GET() {
         o.razorpayOrderId,
         o.createdAt,
         o.updatedAt,
+        o.shippingAddress,
+        o.shippingCity,
+        o.shippingState,
+        o.shippingZipCode,
+        o.shippingCountry,
+        o.customerPhone,
         COUNT(oi.id) as itemCount
       FROM orders o
       LEFT JOIN users u ON o.userId = u.id
@@ -104,6 +116,14 @@ export async function GET() {
       updatedAt: order.updatedAt,
       itemCount: Number(order.itemCount),
       items: itemsByOrder[order.id] || [],
+      shippingAddress: {
+        address: order.shippingAddress,
+        city: order.shippingCity,
+        state: order.shippingState,
+        zipCode: order.shippingZipCode,
+        country: order.shippingCountry,
+      },
+      customerPhone: order.customerPhone,
     }));
 
     return NextResponse.json({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation"; // Import useRouter
@@ -19,8 +19,26 @@ import {
   Minus,
   Plus,
   Trash2,
+  BookMarked,
 } from "lucide-react";
 import { resolveMediaUrl } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+
+interface Address {
+  id: string;
+  userId: string;
+  isDefault: boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  address: string;
+  apartment: string | null;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
 
 export default function CheckoutPage() {
   const items = useCartStore((state) => state.items);
@@ -30,6 +48,12 @@ export default function CheckoutPage() {
   const clear = useCartStore((state) => state.clear);
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter(); // Initialize router
+
+  // Address and form states
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+  const [saveAddress, setSaveAddress] = useState(true);
 
   // Form states
   const [shippingInfo, setShippingInfo] = useState({
@@ -43,6 +67,50 @@ export default function CheckoutPage() {
     zipCode: "",
     phone: "",
   });
+
+  // Fetch saved addresses on mount
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const response = await fetch("/api/addresses");
+        if (!response.ok) throw new Error("Failed to fetch addresses");
+        const data = await response.json();
+        setSavedAddresses(data.addresses || []);
+
+        const defaultAddress = data.addresses?.find(
+          (addr: Address) => addr.isDefault
+        );
+        if (defaultAddress) {
+          setSelectedAddress(defaultAddress);
+        } else if (data.addresses?.length > 0) {
+          setSelectedAddress(data.addresses[0]);
+        } else {
+          setShowNewAddressForm(true); // No addresses, show form by default
+        }
+      } catch (error) {
+        console.error(error);
+        setShowNewAddressForm(true); // Show form if fetch fails
+      }
+    };
+    fetchAddresses();
+  }, []);
+
+  // Sync form with selected address
+  useEffect(() => {
+    if (selectedAddress && !showNewAddressForm) {
+      setShippingInfo({
+        email: selectedAddress.email,
+        firstName: selectedAddress.firstName,
+        lastName: selectedAddress.lastName,
+        address: selectedAddress.address,
+        apartment: selectedAddress.apartment || "",
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        zipCode: selectedAddress.zipCode,
+        phone: selectedAddress.phone || "",
+      });
+    }
+  }, [selectedAddress, showNewAddressForm]);
 
   // Billing info state removed - not currently used
   // const [billingInfo, setBillingInfo] = useState({
@@ -88,6 +156,7 @@ export default function CheckoutPage() {
         },
         body: JSON.stringify({
           shippingInfo,
+          saveAddress: showNewAddressForm ? saveAddress : false, // Only save if it's a new address
           items,
           subtotal,
           shippingCost,
@@ -205,134 +274,203 @@ export default function CheckoutPage() {
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
                     <Truck className="h-4 w-4 sm:h-5 sm:w-5" />
-                    <span className="flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-primary rounded-full">
-                      2
-                    </span>
                     <span>Shipping Information</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First name</Label>
-                      <Input
-                        id="firstName"
-                        value={shippingInfo.firstName}
-                        onChange={(e) =>
-                          setShippingInfo((prev) => ({
-                            ...prev,
-                            firstName: e.target.value,
-                          }))
-                        }
-                        required
-                      />
+                  {savedAddresses.length > 0 && !showNewAddressForm ? (
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        Select a saved address or add a new one.
+                      </p>
+                      <div className="space-y-3">
+                        {savedAddresses.map((addr) => (
+                          <div
+                            key={addr.id}
+                            className={`p-4 border rounded-lg cursor-pointer ${
+                              selectedAddress?.id === addr.id
+                                ? "border-primary ring-2 ring-primary"
+                                : "hover:border-gray-400"
+                            }`}
+                            onClick={() => setSelectedAddress(addr)}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="font-medium">
+                                {addr.firstName} {addr.lastName}
+                                {addr.isDefault && (
+                                  <Badge variant="secondary" className="ml-2">
+                                    Default
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {addr.address}, {addr.city}, {addr.state}{" "}
+                              {addr.zipCode}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {addr.phone}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setShowNewAddressForm(true);
+                          setSelectedAddress(null);
+                        }}
+                      >
+                        Add a New Address
+                      </Button>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last name</Label>
-                      <Input
-                        id="lastName"
-                        value={shippingInfo.lastName}
-                        onChange={(e) =>
-                          setShippingInfo((prev) => ({
-                            ...prev,
-                            lastName: e.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="firstName">First name</Label>
+                          <Input
+                            id="firstName"
+                            value={shippingInfo.firstName}
+                            onChange={(e) =>
+                              setShippingInfo((prev) => ({
+                                ...prev,
+                                firstName: e.target.value,
+                              }))
+                            }
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="lastName">Last name</Label>
+                          <Input
+                            id="lastName"
+                            value={shippingInfo.lastName}
+                            onChange={(e) =>
+                              setShippingInfo((prev) => ({
+                                ...prev,
+                                lastName: e.target.value,
+                              }))
+                            }
+                            required
+                          />
+                        </div>
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      value={shippingInfo.address}
-                      onChange={(e) =>
-                        setShippingInfo((prev) => ({
-                          ...prev,
-                          address: e.target.value,
-                        }))
-                      }
-                      required
-                    />
-                  </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="address">Address</Label>
+                        <Input
+                          id="address"
+                          value={shippingInfo.address}
+                          onChange={(e) =>
+                            setShippingInfo((prev) => ({
+                              ...prev,
+                              address: e.target.value,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="apartment">
-                      Apartment, suite, etc. (optional)
-                    </Label>
-                    <Input
-                      id="apartment"
-                      value={shippingInfo.apartment}
-                      onChange={(e) =>
-                        setShippingInfo((prev) => ({
-                          ...prev,
-                          apartment: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="apartment">
+                          Apartment, suite, etc. (optional)
+                        </Label>
+                        <Input
+                          id="apartment"
+                          value={shippingInfo.apartment}
+                          onChange={(e) =>
+                            setShippingInfo((prev) => ({
+                              ...prev,
+                              apartment: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                    <div className="sm:col-span-2 lg:col-span-1 space-y-2">
-                      <Label htmlFor="city">City</Label>
-                      <Input
-                        id="city"
-                        value={shippingInfo.city}
-                        onChange={(e) =>
-                          setShippingInfo((prev) => ({
-                            ...prev,
-                            city: e.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="state">State</Label>
-                      <Input
-                        id="state"
-                        value={shippingInfo.state}
-                        onChange={(e) =>
-                          setShippingInfo((prev) => ({
-                            ...prev,
-                            state: e.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="zipCode">ZIP code</Label>
-                      <Input
-                        id="zipCode"
-                        value={shippingInfo.zipCode}
-                        onChange={(e) =>
-                          setShippingInfo((prev) => ({
-                            ...prev,
-                            zipCode: e.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                  </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                        <div className="sm:col-span-2 lg:col-span-1 space-y-2">
+                          <Label htmlFor="city">City</Label>
+                          <Input
+                            id="city"
+                            value={shippingInfo.city}
+                            onChange={(e) =>
+                              setShippingInfo((prev) => ({
+                                ...prev,
+                                city: e.target.value,
+                              }))
+                            }
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="state">State</Label>
+                          <Input
+                            id="state"
+                            value={shippingInfo.state}
+                            onChange={(e) =>
+                              setShippingInfo((prev) => ({
+                                ...prev,
+                                state: e.target.value,
+                              }))
+                            }
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="zipCode">ZIP code</Label>
+                          <Input
+                            id="zipCode"
+                            value={shippingInfo.zipCode}
+                            onChange={(e) =>
+                              setShippingInfo((prev) => ({
+                                ...prev,
+                                zipCode: e.target.value,
+                              }))
+                            }
+                            required
+                          />
+                        </div>
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={shippingInfo.phone}
-                      onChange={(e) =>
-                        setShippingInfo((prev) => ({
-                          ...prev,
-                          phone: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone number</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={shippingInfo.phone}
+                          onChange={(e) =>
+                            setShippingInfo((prev) => ({
+                              ...prev,
+                              phone: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center space-x-2 pt-2">
+                        <input
+                          type="checkbox"
+                          id="save-address"
+                          checked={saveAddress}
+                          onChange={(e) => setSaveAddress(e.target.checked)}
+                          className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                        />
+                        <Label htmlFor="save-address" className="text-sm">
+                          Save this address for future use
+                        </Label>
+                      </div>
+                      {savedAddresses.length > 0 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowNewAddressForm(false)}
+                        >
+                          <BookMarked className="mr-2 h-4 w-4" />
+                          Choose a saved address
+                        </Button>
+                      )}
+                    </>
+                  )}
                 </CardContent>
               </Card>
 

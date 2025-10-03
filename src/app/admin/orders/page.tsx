@@ -29,6 +29,14 @@ interface OrderItem {
   price: number;
 }
 
+interface ShippingAddress {
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
 interface Order {
   id: string;
   userId: string;
@@ -43,6 +51,8 @@ interface Order {
   updatedAt: string;
   itemCount: number;
   items: OrderItem[];
+  shippingAddress: ShippingAddress;
+  customerPhone: string | null;
 }
 
 export default function OrdersPage() {
@@ -252,33 +262,71 @@ export default function OrdersPage() {
 
                     {isExpanded && (
                       <div className="p-4 border-t space-y-4">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="text-muted-foreground">
-                              Payment Method
-                            </p>
-                            <p className="font-medium">{order.paymentMethod}</p>
-                          </div>
-                          {order.razorpayOrderId && (
-                            <div>
-                              <p className="text-muted-foreground">
-                                Razorpay Order ID
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                          {/* Shipping Details */}
+                          <div className="md:col-span-1 space-y-2">
+                            <h4 className="font-medium text-gray-800">
+                              Shipping Address
+                            </h4>
+                            <div className="text-muted-foreground">
+                              <p>{order.shippingAddress.address}</p>
+                              <p>
+                                {order.shippingAddress.city},{" "}
+                                {order.shippingAddress.state}{" "}
+                                {order.shippingAddress.zipCode}
                               </p>
-                              <p className="font-medium font-mono text-xs">
-                                {order.razorpayOrderId}
-                              </p>
+                              <p>{order.shippingAddress.country}</p>
+                              {order.customerPhone && (
+                                <p>Phone: {order.customerPhone}</p>
+                              )}
                             </div>
-                          )}
-                          <div>
-                            <p className="text-muted-foreground">Items Count</p>
-                            <p className="font-medium">{order.itemCount}</p>
                           </div>
-                          <div>
-                            <p className="text-muted-foreground">
-                              Last Updated
+
+                          {/* Payment Details */}
+                          <div className="md:col-span-1 space-y-2">
+                            <h4 className="font-medium text-gray-800">
+                              Payment Details
+                            </h4>
+                            <p>
+                              <span className="text-muted-foreground">
+                                Method:{" "}
+                              </span>
+                              <span className="font-medium">
+                                {order.paymentMethod}
+                              </span>
                             </p>
-                            <p className="font-medium">
-                              {new Date(order.updatedAt).toLocaleString()}
+                            {order.razorpayOrderId && (
+                              <p>
+                                <span className="text-muted-foreground">
+                                  Razorpay ID:{" "}
+                                </span>
+                                <span className="font-medium font-mono text-xs">
+                                  {order.razorpayOrderId}
+                                </span>
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Order Meta */}
+                          <div className="md:col-span-1 space-y-2">
+                            <h4 className="font-medium text-gray-800">
+                              Order Info
+                            </h4>
+                            <p>
+                              <span className="text-muted-foreground">
+                                Items:{" "}
+                              </span>
+                              <span className="font-medium">
+                                {order.itemCount}
+                              </span>
+                            </p>
+                            <p>
+                              <span className="text-muted-foreground">
+                                Last Updated:{" "}
+                              </span>
+                              <span className="font-medium">
+                                {new Date(order.updatedAt).toLocaleString()}
+                              </span>
                             </p>
                           </div>
                         </div>

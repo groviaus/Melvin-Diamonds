@@ -25,6 +25,7 @@ interface RequestBody {
     zipCode: string;
     phone: string;
   };
+  saveAddress: boolean;
   items: CartItem[];
   subtotal: number;
   shippingCost: number;
@@ -41,7 +42,15 @@ export async function POST(req: NextRequest) {
 
   try {
     const body: RequestBody = await req.json();
-    const { shippingInfo, items, subtotal, shippingCost, tax, total } = body;
+    const {
+      shippingInfo,
+      saveAddress,
+      items,
+      subtotal,
+      shippingCost,
+      tax,
+      total,
+    } = body;
     const userId = session.user.id;
 
     // --- Data Validation ---
@@ -116,6 +125,37 @@ export async function POST(req: NextRequest) {
       });
 
       await Promise.all(orderItemsQueries);
+
+      // 3. (Optional) Save the address if requested
+      if (saveAddress) {
+        // Check if this should be the default address
+        const [existingAddresses] = await connection.query<RowDataPacket[]>(
+          "SELECT id FROM addresses WHERE userId = ?",
+          [userId]
+        );
+        const isDefault = existingAddresses.length === 0;
+
+        const addressId = uuidv4();
+        await connection.query(
+          `INSERT INTO addresses (id, userId, isDefault, firstName, lastName, email, phone, address, apartment, city, state, zipCode, country)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            addressId,
+            userId,
+            isDefault,
+            shippingInfo.firstName,
+            shippingInfo.lastName,
+            shippingInfo.email,
+            shippingInfo.phone,
+            shippingInfo.address,
+            shippingInfo.apartment,
+            shippingInfo.city,
+            shippingInfo.state,
+            shippingInfo.zipCode,
+            "India", // Assuming default country for now
+          ]
+        );
+      }
 
       await connection.commit();
 
