@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/stores/userStore";
 import { Mail, Shield, Home, Upload, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ user, addresses }: ProfileFormProps) {
   const router = useRouter();
+  const updateUser = useUserStore((state) => state.updateUser);
   const [name, setName] = useState(user.name || "");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(user.image);
@@ -102,11 +104,19 @@ export function ProfileForm({ user, addresses }: ProfileFormProps) {
         body: JSON.stringify({ name, image: imageUrl }),
       });
 
+      const updateResult = await updateResponse.json();
+
       if (!updateResponse.ok) {
         throw new Error("Failed to update profile");
       }
 
-      // 3. Refresh the page to show all updated data from the server
+      // 3. Update the Zustand store in real-time
+      updateUser({
+        name: updateResult.name,
+        image: updateResult.image,
+      });
+
+      // 4. Refresh server components on the page
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");

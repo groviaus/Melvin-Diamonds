@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   Search,
   User,
@@ -24,9 +25,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUserStore } from "@/stores/userStore";
 
 export default function Header() {
   const { data: session, status } = useSession();
+  const { name, image, setUser } = useUserStore();
+
+  useEffect(() => {
+    if (session?.user) {
+      setUser({
+        name: session.user.name ?? null,
+        image: session.user.image ?? null,
+      });
+    }
+  }, [session, setUser]);
+
   const user = session?.user;
   const isAdmin = user?.role === "admin" || user?.role === "super_admin";
 
@@ -112,15 +125,13 @@ export default function Header() {
                         {status === "authenticated" && user ? (
                           <Avatar className="h-8 w-8">
                             <AvatarImage
-                              src={user.image || undefined}
-                              alt={user.name || "User"}
+                              src={image || undefined}
+                              alt={name || "User"}
                             />
-                            <AvatarFallback>
-                              {getInitials(user.name)}
-                            </AvatarFallback>
+                            <AvatarFallback>{getInitials(name)}</AvatarFallback>
                           </Avatar>
                         ) : (
-                          <User className="min-h-5 min-w-5 text-gray-600 " />
+                          <User className="min-h-5 min-w-5 text-gray-600" />
                         )}
                       </Button>
                     </DropdownMenuTrigger>
@@ -134,7 +145,7 @@ export default function Header() {
                           <DropdownMenuLabel className="font-normal">
                             <div className="flex flex-col space-y-1">
                               <p className="text-sm font-medium leading-none">
-                                Hello, {user.name}
+                                Hello, {name}
                               </p>
                               <p className="text-xs leading-none text-muted-foreground">
                                 {user.email}
