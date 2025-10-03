@@ -111,11 +111,11 @@ export default function Header() {
               <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-teal-700 transition-colors cursor-pointer " />
 
               {status === "loading" && (
-                <div className="h-8 w-8 animate-pulse rounded-full bg-muted hidden sm:block"></div>
+                <div className="h-8 w-8 animate-pulse rounded-full bg-muted "></div>
               )}
 
               {status !== "loading" && (
-                <div className="hidden sm:block">
+                <div className="">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
