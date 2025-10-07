@@ -8,7 +8,9 @@ import { productAPI } from "@/lib/api";
 import { Product } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
+import { useRingSizerStore } from "@/stores/ringSizerStore";
 import { Card, CardContent } from "@/components/ui/card";
+import RingSizer from "@/components/RingSizer";
 import {
   Loader2Icon,
   ChevronLeft,
@@ -16,6 +18,7 @@ import {
   Share2,
   Minus,
   Plus,
+  Ruler,
 } from "lucide-react";
 import { resolveMediaUrl } from "@/lib/utils";
 
@@ -28,7 +31,10 @@ export default function ProductDetailClient() {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
+  const [showRingSizer, setShowRingSizer] = useState(false);
+  const [latestMeasurement, setLatestMeasurement] = useState<any>(null);
   const addItem = useCartStore((state) => state.addItem);
+  const { getLatestMeasurement } = useRingSizerStore();
 
   useEffect(() => {
     if (!params?.id) return;
@@ -39,6 +45,13 @@ export default function ProductDetailClient() {
         setProduct(p);
         if (p.ringSizes?.length) setSelectedSize(p.ringSizes[0]);
         if (p.mainImage) setSelectedImage(p.mainImage);
+
+        // Check if user has a recent ring size measurement
+        const measurement = getLatestMeasurement();
+        setLatestMeasurement(measurement);
+        if (measurement && p.ringSizes?.includes(measurement.size)) {
+          setSelectedSize(measurement.size);
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -46,7 +59,13 @@ export default function ProductDetailClient() {
       }
     };
     run();
-  }, [params?.id]);
+  }, [params?.id, getLatestMeasurement]);
+
+  // Function to refresh latest measurement
+  const refreshMeasurement = () => {
+    const measurement = getLatestMeasurement();
+    setLatestMeasurement(measurement);
+  };
 
   if (isLoading) {
     return (
@@ -173,24 +192,75 @@ export default function ProductDetailClient() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium">Ring Size</label>
-                  <span className="text-xs text-muted-foreground">
-                    Required
-                  </span>
-                </div>
-                <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
-                  {product.ringSizes.map((size) => (
-                    <button
-                      key={size}
-                      className={`px-3 py-2 text-sm font-medium border rounded-md transition-all duration-200 ${
-                        size === selectedSize
-                          ? "bg-foreground text-background border-foreground"
-                          : "border-border hover:border-foreground/50 hover:bg-muted"
-                      }`}
-                      onClick={() => setSelectedSize(size)}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      Required
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowRingSizer(true)}
+                      className="text-xs"
                     >
-                      {size}
-                    </button>
-                  ))}
+                      <Ruler className="w-3 h-3 mr-1" />
+                      Measure
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Measurement Info */}
+                {latestMeasurement && (
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span className="text-sm font-medium text-blue-900">
+                          Your measured size: {latestMeasurement.size}
+                        </span>
+                      </div>
+                      <div className="text-xs text-blue-700">
+                        {latestMeasurement.diameter.toFixed(1)}mm diameter
+                      </div>
+                    </div>
+                    <div className="mt-1 text-xs text-blue-600">
+                      Measured on{" "}
+                      {new Date(
+                        latestMeasurement.timestamp
+                      ).toLocaleDateString()}
+                      {latestMeasurement.deviceInfo && (
+                        <span className="ml-2">
+                          • {latestMeasurement.deviceInfo.deviceName}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                  {product.ringSizes.map((size) => {
+                    const isMeasuredSize =
+                      latestMeasurement && size === latestMeasurement.size;
+                    const isSelected = size === selectedSize;
+
+                    return (
+                      <button
+                        key={size}
+                        className={`px-3 py-2 text-sm font-medium border rounded-md transition-all duration-200 relative ${
+                          isSelected
+                            ? "bg-foreground text-background border-foreground"
+                            : isMeasuredSize
+                            ? "bg-blue-100 text-blue-900 border-blue-300 ring-1 ring-blue-200"
+                            : "border-border hover:border-foreground/50 hover:bg-muted"
+                        }`}
+                        onClick={() => setSelectedSize(size)}
+                      >
+                        {size}
+                        {isMeasuredSize && !isSelected && (
+                          <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -296,6 +366,18 @@ export default function ProductDetailClient() {
           </div>
         </div>
       </div>
+
+      {/* Ring Sizer Modal */}
+      {showRingSizer && (
+        <RingSizer
+          onClose={() => setShowRingSizer(false)}
+          onSizeSelected={(size, diameter) => {
+            setSelectedSize(size);
+            refreshMeasurement();
+            setShowRingSizer(false);
+          }}
+        />
+      )}
     </div>
   );
 }

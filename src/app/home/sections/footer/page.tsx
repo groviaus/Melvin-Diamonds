@@ -84,7 +84,7 @@ export default function Footer() {
                   id="footer-email"
                   type="email"
                   placeholder="Your Email Address"
-                  className="flex-1  border border-white px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-white text-white"
+                  className="flex-1  border border-white px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-white text-white w-36 sm:w-auto"
                 />
                 <button
                   type="submit"
