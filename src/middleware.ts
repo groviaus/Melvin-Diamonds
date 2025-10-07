@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "./auth";
 
+export const runtime = "nodejs";
+
 export async function middleware(request: NextRequest) {
   const session = await auth();
   const { nextUrl } = request;
