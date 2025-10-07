@@ -103,13 +103,19 @@ export async function POST(req: NextRequest) {
         ]
       );
 
-      // 2. Create Order Items
+      // 2. Create Order Items with complete product snapshot
       const orderItemsQueries = items.map((item) => {
         const itemId = uuidv4();
-        // Fetch product details to store a snapshot
+        // Fetch complete product details to store a comprehensive snapshot
         return connection.query(
-          `INSERT INTO order_items (id, orderId, productId, productTitle, productImage, productDescription, size, quantity, price, subtotal)
-           SELECT ?, ?, ?, p.title, p.mainImage, p.description, ?, ?, ?, ?
+          `INSERT INTO order_items (
+            id, orderId, productId, productTitle, productImage, productDescription, 
+            productCategories, productTags, productDetails, productGalleryImages, 
+            productRingSizes, productPrice, size, quantity, price, subtotal
+          )
+           SELECT ?, ?, ?, p.title, p.mainImage, p.description, 
+                  p.categories, p.tags, p.details, p.galleryImages, 
+                  p.ringSizes, p.price, ?, ?, ?, ?
            FROM products p WHERE p.id = ?`,
           [
             itemId,

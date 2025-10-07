@@ -28,6 +28,14 @@ interface OrderItemRow extends RowDataPacket {
   productId: string;
   productName: string;
   productDescription: string | null;
+  productImage: string | null;
+  productCategories: string;
+  productTags: string;
+  productDetails: string;
+  productGalleryImages: string;
+  productRingSizes: string;
+  productPrice: number;
+  selectedRingSize: string | null;
   quantity: number;
   price: number;
 }
@@ -62,13 +70,21 @@ export async function GET() {
       ORDER BY o.createdAt DESC`
     );
 
-    // Get all order items
+    // Get all order items with enhanced product details
     const [orderItems] = await pool.query<OrderItemRow[]>(
       `SELECT 
         oi.orderId,
         oi.productId,
         oi.productTitle as productName,
         oi.productDescription,
+        oi.productImage,
+        oi.productCategories,
+        oi.productTags,
+        oi.productDetails,
+        oi.productGalleryImages,
+        oi.productRingSizes,
+        oi.productPrice,
+        oi.size as selectedRingSize,
         oi.quantity,
         oi.price
       FROM order_items oi`
@@ -84,6 +100,22 @@ export async function GET() {
           productId: item.productId,
           productName: item.productName,
           productDescription: item.productDescription,
+          productImage: item.productImage,
+          productCategories: item.productCategories
+            ? JSON.parse(item.productCategories)
+            : [],
+          productTags: item.productTags ? JSON.parse(item.productTags) : [],
+          productDetails: item.productDetails
+            ? JSON.parse(item.productDetails)
+            : [],
+          productGalleryImages: item.productGalleryImages
+            ? JSON.parse(item.productGalleryImages)
+            : [],
+          productRingSizes: item.productRingSizes
+            ? JSON.parse(item.productRingSizes)
+            : [],
+          productPrice: Number(item.productPrice),
+          selectedRingSize: item.selectedRingSize,
           quantity: item.quantity,
           price: Number(item.price),
         });
@@ -95,6 +127,14 @@ export async function GET() {
           productId: string;
           productName: string;
           productDescription: string | null;
+          productImage: string | null;
+          productCategories: string[];
+          productTags: string[];
+          productDetails: string[];
+          productGalleryImages: string[];
+          productRingSizes: string[];
+          productPrice: number;
+          selectedRingSize: string | null;
           quantity: number;
           price: number;
         }>

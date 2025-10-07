@@ -259,9 +259,9 @@ export default function RingSizer({ onClose, onSizeSelected }: RingSizerProps) {
                   <Alert className="mt-2">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription className="text-xs">
-                      We couldn&apos;t match your exact device; measurement accuracy
-                      may be ±0.2 mm. Please use an actual ring for best
-                      results.
+                      We couldn&apos;t match your exact device; measurement
+                      accuracy may be ±0.2 mm. Please use an actual ring for
+                      best results.
                     </AlertDescription>
                   </Alert>
                 )}

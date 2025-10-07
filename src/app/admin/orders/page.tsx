@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -25,6 +26,14 @@ interface OrderItem {
   productId: string;
   productName: string;
   productDescription: string | null;
+  productImage: string | null;
+  productCategories: string[];
+  productTags: string[];
+  productDetails: string[];
+  productGalleryImages: string[];
+  productRingSizes: string[];
+  productPrice: number;
+  selectedRingSize: string | null;
   quantity: number;
   price: number;
 }
@@ -334,33 +343,185 @@ export default function OrdersPage() {
                         {order.items.length > 0 && (
                           <div>
                             <h4 className="font-medium mb-2">Order Items:</h4>
-                            <div className="space-y-2">
+                            <div className="space-y-4">
                               {order.items.map((item, idx) => (
                                 <div
                                   key={idx}
-                                  className="flex justify-between items-start p-3 bg-gray-50 rounded"
+                                  className="p-4 bg-gray-50 rounded-lg border"
                                 >
-                                  <div className="flex-1">
-                                    <p className="font-medium">
-                                      {item.productName}
-                                    </p>
-                                    {item.productDescription && (
-                                      <p className="text-sm text-muted-foreground">
-                                        {item.productDescription}
+                                  <div className="flex justify-between items-start mb-3">
+                                    <div className="flex-1">
+                                      <div className="flex items-start gap-3">
+                                        {item.productImage && (
+                                          <Image
+                                            src={item.productImage}
+                                            alt={item.productName}
+                                            width={64}
+                                            height={64}
+                                            className="w-16 h-16 object-cover rounded"
+                                          />
+                                        )}
+                                        <div className="flex-1">
+                                          <p className="font-medium text-lg">
+                                            {item.productName}
+                                          </p>
+                                          {item.productDescription && (
+                                            <p className="text-sm text-muted-foreground mt-1">
+                                              {item.productDescription}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <p className="font-medium">
+                                        {formatCurrency(item.price)} ×{" "}
+                                        {item.quantity}
                                       </p>
+                                      <p className="text-sm text-muted-foreground">
+                                        Total:{" "}
+                                        {formatCurrency(
+                                          item.price * item.quantity
+                                        )}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Product Details */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    {/* Categories */}
+                                    {item.productCategories.length > 0 && (
+                                      <div>
+                                        <span className="font-medium text-gray-700">
+                                          Categories:
+                                        </span>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                          {item.productCategories.map(
+                                            (category, catIdx) => (
+                                              <span
+                                                key={catIdx}
+                                                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                                              >
+                                                {category}
+                                              </span>
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Tags */}
+                                    {item.productTags.length > 0 && (
+                                      <div>
+                                        <span className="font-medium text-gray-700">
+                                          Tags:
+                                        </span>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                          {item.productTags.map(
+                                            (tag, tagIdx) => (
+                                              <span
+                                                key={tagIdx}
+                                                className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded"
+                                              >
+                                                {tag}
+                                              </span>
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Ring Size Information */}
+                                    {item.productRingSizes.length > 0 && (
+                                      <div>
+                                        <span className="font-medium text-gray-700">
+                                          Available Ring Sizes:
+                                        </span>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                          {item.productRingSizes.map(
+                                            (size, sizeIdx) => (
+                                              <span
+                                                key={sizeIdx}
+                                                className={`px-2 py-1 text-xs rounded ${
+                                                  size === item.selectedRingSize
+                                                    ? "bg-rose-200 text-rose-800 font-medium"
+                                                    : "bg-gray-100 text-gray-700"
+                                                }`}
+                                              >
+                                                {size}
+                                              </span>
+                                            )
+                                          )}
+                                        </div>
+                                        {item.selectedRingSize && (
+                                          <p className="text-sm text-rose-600 mt-1">
+                                            <strong>
+                                              Selected Size:{" "}
+                                              {item.selectedRingSize}
+                                            </strong>
+                                          </p>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {/* Product Details */}
+                                    {item.productDetails.length > 0 && (
+                                      <div>
+                                        <span className="font-medium text-gray-700">
+                                          Product Details:
+                                        </span>
+                                        <ul className="mt-1 space-y-1">
+                                          {item.productDetails.map(
+                                            (detail, detailIdx) => (
+                                              <li
+                                                key={detailIdx}
+                                                className="text-xs text-gray-600"
+                                              >
+                                                • {detail}
+                                              </li>
+                                            )
+                                          )}
+                                        </ul>
+                                      </div>
                                     )}
                                   </div>
-                                  <div className="text-right">
-                                    <p className="font-medium">
-                                      {formatCurrency(item.price)} ×{" "}
-                                      {item.quantity}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                      Total:{" "}
-                                      {formatCurrency(
-                                        item.price * item.quantity
-                                      )}
-                                    </p>
+
+                                  {/* Price Information */}
+                                  <div className="mt-3 pt-3 border-t border-gray-200">
+                                    <div className="flex justify-between text-sm">
+                                      <span>Original Price:</span>
+                                      <span>
+                                        {formatCurrency(item.productPrice)}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                      <span>Order Price:</span>
+                                      <span className="font-medium">
+                                        {formatCurrency(item.price)}
+                                      </span>
+                                    </div>
+                                    {item.productPrice !== item.price && (
+                                      <div className="flex justify-between text-sm text-green-600">
+                                        <span>Discount:</span>
+                                        <span>
+                                          {formatCurrency(
+                                            item.productPrice - item.price
+                                          )}
+                                        </span>
+                                      </div>
+                                    )}
+                                    <div className="flex justify-between text-sm font-medium">
+                                      <span>Quantity:</span>
+                                      <span>{item.quantity}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm font-medium">
+                                      <span>Total:</span>
+                                      <span>
+                                        {formatCurrency(
+                                          item.price * item.quantity
+                                        )}
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                               ))}
