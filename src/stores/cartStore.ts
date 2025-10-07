@@ -27,6 +27,11 @@ export const useCartStore = create<CartStore>()(
       items: [],
 
       addItem: (product, quantity = 1, size) => {
+        // Validate ring size requirement
+        if (product.ringSizes && product.ringSizes.length > 0 && !size) {
+          throw new Error("Ring size is required for this product");
+        }
+
         set((state) => {
           const idx = state.items.findIndex(
             (i) => i.productId === product.id && (i.size || "") === (size || "")

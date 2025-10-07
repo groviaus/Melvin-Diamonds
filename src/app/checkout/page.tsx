@@ -146,6 +146,20 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (disabled) return;
+
+    // Validate ring sizes for ring products
+    const ringProductsWithoutSize = items.filter((item) => {
+      // Check if this is a ring product (has ringSizes) but no size selected
+      return item.size === null || item.size === undefined || item.size === "";
+    });
+
+    if (ringProductsWithoutSize.length > 0) {
+      alert(
+        "Please select ring sizes for all ring products before placing order"
+      );
+      return;
+    }
+
     setIsProcessing(true);
 
     try {

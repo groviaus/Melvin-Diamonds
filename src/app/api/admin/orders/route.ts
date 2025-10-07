@@ -29,15 +29,10 @@ interface OrderItemRow extends RowDataPacket {
   productName: string;
   productDescription: string | null;
   productImage: string | null;
-  productCategories: string;
-  productTags: string;
-  productDetails: string;
-  productGalleryImages: string;
-  productRingSizes: string;
-  productPrice: number;
   selectedRingSize: string | null;
   quantity: number;
   price: number;
+  productRingSizes: string;
 }
 
 export async function GET() {
@@ -74,7 +69,7 @@ export async function GET() {
 
     console.log(`Found ${orders.length} orders`);
 
-    // Get all order items (simplified query)
+    // Get all order items with ring size data
     console.log("Fetching order items...");
     const [orderItems] = await pool.query<OrderItemRow[]>(
       `SELECT 
@@ -85,7 +80,8 @@ export async function GET() {
         oi.productImage,
         oi.size as selectedRingSize,
         oi.quantity,
-        oi.price
+        oi.price,
+        COALESCE(oi.productRingSizes, '[]') as productRingSizes
       FROM order_items oi`
     );
 
@@ -106,7 +102,9 @@ export async function GET() {
           productTags: [],
           productDetails: [],
           productGalleryImages: [],
-          productRingSizes: [],
+          productRingSizes: item.productRingSizes
+            ? JSON.parse(item.productRingSizes)
+            : [],
           productPrice: Number(item.price),
           selectedRingSize: item.selectedRingSize,
           quantity: item.quantity,

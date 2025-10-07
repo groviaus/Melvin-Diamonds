@@ -307,32 +307,71 @@ export default function ProductDetailClient() {
 
             {/* Action Buttons */}
             <div className="space-y-3 pt-4">
+              {/* Ring Size Validation Message */}
+              {product.ringSizes?.length > 0 && !selectedSize && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-amber-800">
+                      Please select a ring size before adding to cart
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Button
                   size="lg"
                   className="h-12 text-base font-medium"
+                  disabled={product.ringSizes?.length > 0 && !selectedSize}
                   onClick={() => {
                     if (!product) return;
-                    addItem(product, quantity, selectedSize || undefined);
+                    if (product.ringSizes?.length > 0 && !selectedSize) {
+                      alert("Please select a ring size before adding to cart");
+                      return;
+                    }
+                    try {
+                      addItem(product, quantity, selectedSize || undefined);
+                    } catch (error) {
+                      alert("Ring size is required for this product");
+                    }
                   }}
                 >
-                  Add to Cart
+                  {product.ringSizes?.length > 0 && !selectedSize
+                    ? "Select Ring Size First"
+                    : "Add to Cart"}
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
                   className="h-12 text-base font-medium"
+                  disabled={
+                    (product.ringSizes?.length > 0 && !selectedSize) ||
+                    isBuyingNow
+                  }
                   onClick={async () => {
                     if (!product || isBuyingNow) return;
+                    if (product.ringSizes?.length > 0 && !selectedSize) {
+                      alert("Please select a ring size before placing order");
+                      return;
+                    }
                     setIsBuyingNow(true);
-                    addItem(product, quantity, selectedSize || undefined);
-                    // Small delay to ensure cart is updated
-                    await new Promise((resolve) => setTimeout(resolve, 100));
-                    router.push("/checkout");
+                    try {
+                      addItem(product, quantity, selectedSize || undefined);
+                      // Small delay to ensure cart is updated
+                      await new Promise((resolve) => setTimeout(resolve, 100));
+                      router.push("/checkout");
+                    } catch (error) {
+                      alert("Ring size is required for this product");
+                      setIsBuyingNow(false);
+                    }
                   }}
-                  disabled={isBuyingNow}
                 >
-                  {isBuyingNow ? "Adding to Cart..." : "Buy Now"}
+                  {isBuyingNow
+                    ? "Adding to Cart..."
+                    : product.ringSizes?.length > 0 && !selectedSize
+                    ? "Select Ring Size First"
+                    : "Buy Now"}
                 </Button>
               </div>
 
