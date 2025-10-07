@@ -147,17 +147,27 @@ export default function CheckoutPage() {
     e.preventDefault();
     if (disabled) return;
 
-    // Validate ring sizes for ring products
-    const ringProductsWithoutSize = items.filter((item) => {
-      // Check if this is a ring product (has ringSizes) but no size selected
-      return item.size === null || item.size === undefined || item.size === "";
-    });
+    try {
+      // Validate ring sizes for ring products
+      const ringProductsWithoutSize = items.filter((item) => {
+        // Check if this is a ring product (has ringSizes) but no size selected
+        return (
+          !item.size ||
+          item.size === "" ||
+          item.size === null ||
+          item.size === undefined
+        );
+      });
 
-    if (ringProductsWithoutSize.length > 0) {
-      alert(
-        "Please select ring sizes for all ring products before placing order"
-      );
-      return;
+      if (ringProductsWithoutSize.length > 0) {
+        alert(
+          "Please select ring sizes for all ring products before placing order"
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Error validating ring sizes:", error);
+      // Continue with order if validation fails
     }
 
     setIsProcessing(true);

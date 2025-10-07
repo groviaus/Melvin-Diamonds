@@ -71,19 +71,41 @@ export async function GET() {
 
     // Get all order items with ring size data
     console.log("Fetching order items...");
-    const [orderItems] = await pool.query<OrderItemRow[]>(
-      `SELECT 
-        oi.orderId,
-        oi.productId,
-        oi.productTitle as productName,
-        oi.productDescription,
-        oi.productImage,
-        oi.size as selectedRingSize,
-        oi.quantity,
-        oi.price,
-        COALESCE(oi.productRingSizes, '[]') as productRingSizes
-      FROM order_items oi`
-    );
+    let orderItems: OrderItemRow[] = [];
+
+    try {
+      const [items] = await pool.query<OrderItemRow[]>(
+        `SELECT 
+          oi.orderId,
+          oi.productId,
+          oi.productTitle as productName,
+          oi.productDescription,
+          oi.productImage,
+          oi.size as selectedRingSize,
+          oi.quantity,
+          oi.price,
+          COALESCE(oi.productRingSizes, '[]') as productRingSizes
+        FROM order_items oi`
+      );
+      orderItems = items;
+    } catch (error) {
+      console.error("Error fetching order items:", error);
+      // Fallback to basic query if enhanced query fails
+      const [items] = await pool.query<OrderItemRow[]>(
+        `SELECT 
+          oi.orderId,
+          oi.productId,
+          oi.productTitle as productName,
+          oi.productDescription,
+          oi.productImage,
+          oi.size as selectedRingSize,
+          oi.quantity,
+          oi.price,
+          '[]' as productRingSizes
+        FROM order_items oi`
+      );
+      orderItems = items;
+    }
 
     console.log(`Found ${orderItems.length} order items`);
 
@@ -102,9 +124,13 @@ export async function GET() {
           productTags: [],
           productDetails: [],
           productGalleryImages: [],
-          productRingSizes: item.productRingSizes
-            ? JSON.parse(item.productRingSizes)
-            : [],
+          productRingSizes:
+            item.productRingSizes &&
+            item.productRingSizes !== "null" &&
+            item.productRingSizes !== "[]" &&
+            item.productRingSizes.trim() !== ""
+              ? JSON.parse(item.productRingSizes)
+              : [],
           productPrice: Number(item.price),
           selectedRingSize: item.selectedRingSize,
           quantity: item.quantity,
