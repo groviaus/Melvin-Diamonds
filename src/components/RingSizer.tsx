@@ -47,7 +47,7 @@ type CalibrationMode = "manual" | "auto-detected";
 
 interface RingSizerProps {
   onClose?: () => void;
-  onSizeSelected?: (size: string, diameter: number) => void;
+  onSizeSelected?: (size: string) => void;
 }
 
 export default function RingSizer({ onClose, onSizeSelected }: RingSizerProps) {
@@ -147,7 +147,7 @@ export default function RingSizer({ onClose, onSizeSelected }: RingSizerProps) {
 
     // Call callback if provided
     if (onSizeSelected) {
-      onSizeSelected(suggestedSize, currentDiameter);
+      onSizeSelected(suggestedSize);
     }
 
     // Close modal
@@ -259,7 +259,7 @@ export default function RingSizer({ onClose, onSizeSelected }: RingSizerProps) {
                   <Alert className="mt-2">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription className="text-xs">
-                      We couldn't match your exact device; measurement accuracy
+                      We couldn&apos;t match your exact device; measurement accuracy
                       may be ±0.2 mm. Please use an actual ring for best
                       results.
                     </AlertDescription>

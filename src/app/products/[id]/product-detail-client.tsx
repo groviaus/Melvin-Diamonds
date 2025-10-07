@@ -32,7 +32,19 @@ export default function ProductDetailClient() {
   const [quantity, setQuantity] = useState(1);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [showRingSizer, setShowRingSizer] = useState(false);
-  const [latestMeasurement, setLatestMeasurement] = useState<any>(null);
+  const [latestMeasurement, setLatestMeasurement] = useState<{
+    id: string;
+    size: string;
+    diameter: number;
+    circumference: number;
+    measurementMethod: "manual" | "auto-detected";
+    deviceInfo?: {
+      deviceName?: string;
+      confidence: "high" | "medium" | "low";
+      ppi: number;
+    };
+    timestamp: number;
+  } | null>(null);
   const addItem = useCartStore((state) => state.addItem);
   const { getLatestMeasurement } = useRingSizerStore();
 
@@ -371,7 +383,7 @@ export default function ProductDetailClient() {
       {showRingSizer && (
         <RingSizer
           onClose={() => setShowRingSizer(false)}
-          onSizeSelected={(size, diameter) => {
+          onSizeSelected={(size) => {
             setSelectedSize(size);
             refreshMeasurement();
             setShowRingSizer(false);
