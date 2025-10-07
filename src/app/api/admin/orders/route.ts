@@ -42,7 +42,9 @@ interface OrderItemRow extends RowDataPacket {
 
 export async function GET() {
   try {
-    // Get all orders with user info and item counts
+    console.log("Fetching orders from database...");
+
+    // Get all orders with user info and item counts (simplified like stats API)
     const [orders] = await pool.query<OrderRow[]>(
       `SELECT 
         o.id,
@@ -70,7 +72,10 @@ export async function GET() {
       ORDER BY o.createdAt DESC`
     );
 
-    // Get all order items with enhanced product details
+    console.log(`Found ${orders.length} orders`);
+
+    // Get all order items (simplified query)
+    console.log("Fetching order items...");
     const [orderItems] = await pool.query<OrderItemRow[]>(
       `SELECT 
         oi.orderId,
@@ -78,17 +83,13 @@ export async function GET() {
         oi.productTitle as productName,
         oi.productDescription,
         oi.productImage,
-        oi.productCategories,
-        oi.productTags,
-        oi.productDetails,
-        oi.productGalleryImages,
-        oi.productRingSizes,
-        oi.productPrice,
         oi.size as selectedRingSize,
         oi.quantity,
         oi.price
       FROM order_items oi`
     );
+
+    console.log(`Found ${orderItems.length} order items`);
 
     // Group items by orderId
     const itemsByOrder = orderItems.reduce(
@@ -101,20 +102,12 @@ export async function GET() {
           productName: item.productName,
           productDescription: item.productDescription,
           productImage: item.productImage,
-          productCategories: item.productCategories
-            ? JSON.parse(item.productCategories)
-            : [],
-          productTags: item.productTags ? JSON.parse(item.productTags) : [],
-          productDetails: item.productDetails
-            ? JSON.parse(item.productDetails)
-            : [],
-          productGalleryImages: item.productGalleryImages
-            ? JSON.parse(item.productGalleryImages)
-            : [],
-          productRingSizes: item.productRingSizes
-            ? JSON.parse(item.productRingSizes)
-            : [],
-          productPrice: Number(item.productPrice),
+          productCategories: [],
+          productTags: [],
+          productDetails: [],
+          productGalleryImages: [],
+          productRingSizes: [],
+          productPrice: Number(item.price),
           selectedRingSize: item.selectedRingSize,
           quantity: item.quantity,
           price: Number(item.price),
@@ -165,6 +158,8 @@ export async function GET() {
       },
       customerPhone: order.customerPhone,
     }));
+
+    console.log(`Returning ${ordersWithItems.length} orders with items`);
 
     return NextResponse.json({
       success: true,

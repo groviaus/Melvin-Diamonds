@@ -3,41 +3,42 @@ import pool from "@/lib/db";
 
 export async function GET() {
   try {
-    // Test database connection
-    const [rows] = await pool.query("SELECT 1 as test");
+    console.log("Testing database connection...");
 
-    // Test if users table exists
-    const [tables] = await pool.query("SHOW TABLES LIKE 'users'");
+    // Test basic connection
+    const connection = await pool.getConnection();
+    console.log("Database connection successful");
 
-    // Test if products table exists
-    const [productsTables] = await pool.query("SHOW TABLES LIKE 'products'");
+    // Test orders table
+    const [orders] = await connection.query(
+      "SELECT COUNT(*) as count FROM orders"
+    );
+    console.log("Orders count:", orders);
 
-    // Test if orders table exists
-    const [ordersTables] = await pool.query("SHOW TABLES LIKE 'orders'");
+    // Test order_items table
+    const [orderItems] = await connection.query(
+      "SELECT COUNT(*) as count FROM order_items"
+    );
+    console.log("Order items count:", orderItems);
+
+    // Test table structure
+    const [columns] = await connection.query("DESCRIBE order_items");
+    console.log("Order items columns:", columns);
+
+    connection.release();
 
     return NextResponse.json({
       success: true,
-      message: "Database connection successful",
-      testQuery: rows,
-      tables: {
-        users: (tables as unknown[]).length > 0,
-        products: (productsTables as unknown[]).length > 0,
-        orders: (ordersTables as unknown[]).length > 0,
-      },
-      timestamp: new Date().toISOString(),
+      orders: orders,
+      orderItems: orderItems,
+      columns: columns,
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
     console.error("Database test error:", error);
-
     return NextResponse.json(
       {
         success: false,
-        error: "Database connection failed",
-        details:
-          process.env.NODE_ENV === "development" ? errorMessage : undefined,
-        timestamp: new Date().toISOString(),
+        error: error instanceof Error ? error.message : "Database test failed",
       },
       { status: 500 }
     );
