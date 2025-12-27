@@ -27,6 +27,9 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "v0.dev" },
       { protocol: "https", hostname: "source.unsplash.com" },
       { protocol: "https", hostname: "mavendiamonds.com" },
+      { protocol: "http", hostname: "localhost" },
+      { protocol: "http", hostname: "127.0.0.1" },
+      { protocol: "http", hostname: "62.72.12.146" },
     ],
   },
 };

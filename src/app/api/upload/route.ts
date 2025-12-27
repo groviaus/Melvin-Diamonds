@@ -47,9 +47,8 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     await writeFile(filepath, buffer);
 
-    // Return the public URL
-    const publicBase = process.env.UPLOADS_PUBLIC_BASE || "/uploads";
-    const publicUrl = `${publicBase}/${filename}`;
+    // Return the API route URL for serving the image
+    const publicUrl = `/api/uploads/${filename}`;
 
     console.log("File uploaded successfully:", {
       filename,

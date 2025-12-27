@@ -25,8 +25,10 @@ interface ProductFormData {
   price: string;
   mainImage: File | null;
   mainImageUrl: string;
+  mainImagePreviewUrl: string;
   galleryImages: File[];
   galleryImageUrls: string[];
+  galleryImagePreviewUrls: string[];
   ringSizes: string[];
   categories: string[];
   tags: string[];
@@ -77,8 +79,10 @@ export default function ProductForm({
     price: "",
     mainImage: null,
     mainImageUrl: "",
+    mainImagePreviewUrl: "",
     galleryImages: [],
     galleryImageUrls: [],
+    galleryImagePreviewUrls: [],
     ringSizes: [],
     categories: [],
     tags: [],
@@ -111,6 +115,22 @@ export default function ProductForm({
     loadCategories();
   }, []);
 
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      // Cleanup main image preview URL
+      if (formData.mainImagePreviewUrl) {
+        URL.revokeObjectURL(formData.mainImagePreviewUrl);
+      }
+      // Cleanup gallery image preview URLs
+      formData.galleryImagePreviewUrls.forEach((url) => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [formData.mainImagePreviewUrl, formData.galleryImagePreviewUrls]);
+
   // Populate form when editing product
   useEffect(() => {
     if (editingProduct) {
@@ -120,8 +140,10 @@ export default function ProductForm({
         price: editingProduct.price.toString(),
         mainImage: null,
         mainImageUrl: editingProduct.mainImage,
+        mainImagePreviewUrl: "",
         galleryImages: [],
         galleryImageUrls: editingProduct.galleryImages,
+        galleryImagePreviewUrls: [],
         ringSizes: editingProduct.ringSizes,
         categories: editingProduct.categories,
         tags: editingProduct.tags,
@@ -137,8 +159,10 @@ export default function ProductForm({
         price: "",
         mainImage: null,
         mainImageUrl: "",
+        mainImagePreviewUrl: "",
         galleryImages: [],
         galleryImageUrls: [],
+        galleryImagePreviewUrls: [],
         ringSizes: [],
         categories: [],
         tags: [],
@@ -156,49 +180,71 @@ export default function ProductForm({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = async (
+  const handleImageUpload = (
     event: React.ChangeEvent<HTMLInputElement>,
     type: "main" | "gallery"
   ) => {
     const files = event.target.files;
 
     if (files && files.length > 0) {
-      try {
-        setIsLoading(true);
-
-        if (type === "main") {
-          const file = files[0];
-          const uploadResult = await uploadAPI.uploadImage(file);
-          handleInputChange("mainImage", file);
-          handleInputChange("mainImageUrl", uploadResult.url);
-        } else {
-          const newFiles = Array.from(files);
-          const uploadResults = await uploadAPI.uploadImages(newFiles);
-
-          setFormData((prev) => ({
-            ...prev,
-            galleryImages: [...prev.galleryImages, ...newFiles],
-            galleryImageUrls: [
-              ...prev.galleryImageUrls,
-              ...uploadResults.map((r) => r.url),
-            ],
-          }));
+      if (type === "main") {
+        const file = files[0];
+        
+        // Revoke previous preview URL if exists
+        if (formData.mainImagePreviewUrl) {
+          URL.revokeObjectURL(formData.mainImagePreviewUrl);
         }
-      } catch (error) {
-        console.error("Image upload failed:", error);
-        alert("Failed to upload image. Please try again.");
-      } finally {
-        setIsLoading(false);
+        
+        // Create local preview URL
+        const previewUrl = URL.createObjectURL(file);
+        
+        setFormData((prev) => ({
+          ...prev,
+          mainImage: file,
+          mainImagePreviewUrl: previewUrl,
+          // Clear server URL since we have a new file to upload
+          mainImageUrl: "",
+        }));
+      } else {
+        const newFiles = Array.from(files);
+        
+        // Create preview URLs for new files
+        const newPreviewUrls = newFiles.map((file) => URL.createObjectURL(file));
+
+        setFormData((prev) => ({
+          ...prev,
+          galleryImages: [...prev.galleryImages, ...newFiles],
+          galleryImagePreviewUrls: [
+            ...prev.galleryImagePreviewUrls,
+            ...newPreviewUrls,
+          ],
+          // Add empty strings for URLs that will be filled after upload
+          galleryImageUrls: [
+            ...prev.galleryImageUrls,
+            ...newFiles.map(() => ""),
+          ],
+        }));
       }
+      
+      // Reset file input to allow selecting the same file again
+      event.target.value = "";
     }
   };
 
   const removeGalleryImage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      galleryImages: prev.galleryImages.filter((_, i) => i !== index),
-      galleryImageUrls: prev.galleryImageUrls.filter((_, i) => i !== index),
-    }));
+    setFormData((prev) => {
+      // Revoke object URL if it exists
+      if (prev.galleryImagePreviewUrls[index]) {
+        URL.revokeObjectURL(prev.galleryImagePreviewUrls[index]);
+      }
+      
+      return {
+        ...prev,
+        galleryImages: prev.galleryImages.filter((_, i) => i !== index),
+        galleryImageUrls: prev.galleryImageUrls.filter((_, i) => i !== index),
+        galleryImagePreviewUrls: prev.galleryImagePreviewUrls.filter((_, i) => i !== index),
+      };
+    });
   };
 
   const addRingSize = () => {
@@ -280,7 +326,9 @@ export default function ProductForm({
       alert("Please enter a valid price");
       return;
     }
-    if (!formData.mainImageUrl) {
+    
+    // Check if we have a main image (either uploaded URL or file to upload)
+    if (!formData.mainImageUrl && !formData.mainImage) {
       alert("Please upload a main image");
       return;
     }
@@ -288,12 +336,70 @@ export default function ProductForm({
     try {
       setIsLoading(true);
 
+      // Upload pending images before submitting product data
+      let finalMainImageUrl = formData.mainImageUrl;
+      let finalGalleryImageUrls = [...formData.galleryImageUrls];
+
+      // Upload main image if we have a file but no URL
+      if (formData.mainImage && !formData.mainImageUrl) {
+        try {
+          const uploadResult = await uploadAPI.uploadImage(formData.mainImage);
+          finalMainImageUrl = uploadResult.url;
+          
+          // Revoke preview URL after successful upload
+          if (formData.mainImagePreviewUrl) {
+            URL.revokeObjectURL(formData.mainImagePreviewUrl);
+          }
+        } catch (error) {
+          console.error("Failed to upload main image:", error);
+          alert("Failed to upload main image. Please try again.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Upload gallery images that don't have URLs yet
+      const pendingGalleryIndices: number[] = [];
+      formData.galleryImages.forEach((file, index) => {
+        if (file && !formData.galleryImageUrls[index]) {
+          pendingGalleryIndices.push(index);
+        }
+      });
+
+      if (pendingGalleryIndices.length > 0) {
+        try {
+          const filesToUpload = pendingGalleryIndices.map(
+            (index) => formData.galleryImages[index]
+          );
+          const uploadResults = await uploadAPI.uploadImages(filesToUpload);
+
+          // Update gallery URLs with uploaded URLs
+          uploadResults.forEach((result, uploadIndex) => {
+            const originalIndex = pendingGalleryIndices[uploadIndex];
+            finalGalleryImageUrls[originalIndex] = result.url;
+            
+            // Revoke preview URL after successful upload
+            if (formData.galleryImagePreviewUrls[originalIndex]) {
+              URL.revokeObjectURL(formData.galleryImagePreviewUrls[originalIndex]);
+            }
+          });
+        } catch (error) {
+          console.error("Failed to upload gallery images:", error);
+          alert("Failed to upload gallery images. Please try again.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Filter out empty strings from gallery URLs
+      finalGalleryImageUrls = finalGalleryImageUrls.filter((url) => url !== "");
+
       const productData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         price: parseFloat(formData.price),
-        mainImage: formData.mainImageUrl,
-        galleryImages: formData.galleryImageUrls,
+        mainImage: finalMainImageUrl,
+        galleryImages: finalGalleryImageUrls,
         ringSizes: formData.ringSizes,
         categories: formData.categories,
         tags: formData.tags,
@@ -310,6 +416,16 @@ export default function ProductForm({
         alert("Product created successfully!");
       }
 
+      // Clean up any remaining preview URLs
+      if (formData.mainImagePreviewUrl) {
+        URL.revokeObjectURL(formData.mainImagePreviewUrl);
+      }
+      formData.galleryImagePreviewUrls.forEach((url) => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      });
+
       // Reset form
       setFormData({
         title: "",
@@ -317,8 +433,10 @@ export default function ProductForm({
         price: "",
         mainImage: null,
         mainImageUrl: "",
+        mainImagePreviewUrl: "",
         galleryImages: [],
         galleryImageUrls: [],
+        galleryImagePreviewUrls: [],
         ringSizes: [],
         categories: [],
         tags: [],
@@ -397,10 +515,13 @@ export default function ProductForm({
           <div className="space-y-2">
             <label className="text-sm font-medium">Main Image</label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              {formData.mainImageUrl ? (
+              {formData.mainImagePreviewUrl || formData.mainImageUrl ? (
                 <div className="space-y-2">
                   <Image
-                    src={resolveMediaUrl(formData.mainImageUrl)}
+                    src={
+                      formData.mainImagePreviewUrl ||
+                      resolveMediaUrl(formData.mainImageUrl)
+                    }
                     alt="Main product"
                     width={800}
                     height={320}
@@ -412,8 +533,13 @@ export default function ProductForm({
                     variant="outline"
                     size="sm"
                     onClick={() => {
+                      // Revoke preview URL if exists
+                      if (formData.mainImagePreviewUrl) {
+                        URL.revokeObjectURL(formData.mainImagePreviewUrl);
+                      }
                       handleInputChange("mainImage", null);
                       handleInputChange("mainImageUrl", "");
+                      handleInputChange("mainImagePreviewUrl", "");
                     }}
                   >
                     <XIcon className="w-4 h-4 mr-2" />
@@ -480,29 +606,44 @@ export default function ProductForm({
                 Add Gallery Images
               </Button>
 
-              {formData.galleryImageUrls.length > 0 && (
+              {(formData.galleryImages.length > 0 ||
+                formData.galleryImageUrls.some((url) => url !== "")) && (
                 <div className="mt-4 grid grid-cols-2 gap-2">
-                  {formData.galleryImageUrls.map((imageUrl, index) => (
-                    <div key={index} className="relative">
-                      <Image
-                        src={resolveMediaUrl(imageUrl)}
-                        alt={`Gallery ${index + 1}`}
-                        width={400}
-                        height={96}
-                        className="w-full h-24 object-cover rounded-lg"
-                        unoptimized
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        className="absolute -top-2 -right-2 w-6 h-6 p-0"
-                        onClick={() => removeGalleryImage(index)}
-                      >
-                        <XIcon className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
+                  {Array.from({
+                    length: Math.max(
+                      formData.galleryImages.length,
+                      formData.galleryImageUrls.filter((url) => url !== "").length
+                    ),
+                  }).map((_, index) => {
+                    // Use preview URL if available, otherwise use server URL
+                    const previewUrl = formData.galleryImagePreviewUrls[index];
+                    const serverUrl = formData.galleryImageUrls[index];
+                    const imageSrc = previewUrl || (serverUrl ? resolveMediaUrl(serverUrl) : null);
+                    
+                    if (!imageSrc) return null;
+                    
+                    return (
+                      <div key={index} className="relative">
+                        <Image
+                          src={imageSrc}
+                          alt={`Gallery ${index + 1}`}
+                          width={400}
+                          height={96}
+                          className="w-full h-24 object-cover rounded-lg"
+                          unoptimized
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute -top-2 -right-2 w-6 h-6 p-0"
+                          onClick={() => removeGalleryImage(index)}
+                        >
+                          <XIcon className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -716,14 +857,26 @@ export default function ProductForm({
               type="button"
               variant="outline"
               onClick={() => {
+                // Clean up preview URLs before resetting
+                if (formData.mainImagePreviewUrl) {
+                  URL.revokeObjectURL(formData.mainImagePreviewUrl);
+                }
+                formData.galleryImagePreviewUrls.forEach((url) => {
+                  if (url) {
+                    URL.revokeObjectURL(url);
+                  }
+                });
+                
                 setFormData({
                   title: "",
                   description: "",
                   price: "",
                   mainImage: null,
                   mainImageUrl: "",
+                  mainImagePreviewUrl: "",
                   galleryImages: [],
                   galleryImageUrls: [],
+                  galleryImagePreviewUrls: [],
                   ringSizes: [],
                   categories: [],
                   tags: [],
