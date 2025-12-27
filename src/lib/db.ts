@@ -231,6 +231,12 @@ async function createTables() {
         productTitle VARCHAR(255) NOT NULL,
         productImage VARCHAR(512),
         productDescription TEXT,
+        productCategories ${jsonType},
+        productTags ${jsonType},
+        productDetails ${jsonType},
+        productGalleryImages ${jsonType},
+        productRingSizes ${jsonType},
+        productPrice DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
         size VARCHAR(50),
         quantity INT NOT NULL,
         price DECIMAL(10, 2) NOT NULL,
@@ -243,6 +249,47 @@ async function createTables() {
       )
     `);
     console.log("'order_items' table checked/created successfully.");
+    
+    // Add missing columns to existing table if they don't exist
+    try {
+      const [columns] = await connection.execute<mysql.RowDataPacket[]>(
+        `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+         WHERE TABLE_SCHEMA = DATABASE() 
+         AND TABLE_NAME = 'order_items' 
+         AND COLUMN_NAME IN ('productCategories', 'productTags', 'productDetails', 'productGalleryImages', 'productRingSizes', 'productPrice')`
+      );
+      const existingColumns = columns.map((row: any) => row.COLUMN_NAME);
+      
+      const columnsToAdd = [];
+      if (!existingColumns.includes('productCategories')) {
+        columnsToAdd.push(`ADD COLUMN productCategories ${jsonType}`);
+      }
+      if (!existingColumns.includes('productTags')) {
+        columnsToAdd.push(`ADD COLUMN productTags ${jsonType}`);
+      }
+      if (!existingColumns.includes('productDetails')) {
+        columnsToAdd.push(`ADD COLUMN productDetails ${jsonType}`);
+      }
+      if (!existingColumns.includes('productGalleryImages')) {
+        columnsToAdd.push(`ADD COLUMN productGalleryImages ${jsonType}`);
+      }
+      if (!existingColumns.includes('productRingSizes')) {
+        columnsToAdd.push(`ADD COLUMN productRingSizes ${jsonType}`);
+      }
+      if (!existingColumns.includes('productPrice')) {
+        columnsToAdd.push(`ADD COLUMN productPrice DECIMAL(10, 2) NOT NULL DEFAULT 0.00`);
+      }
+      
+      if (columnsToAdd.length > 0) {
+        await connection.execute(`
+          ALTER TABLE order_items 
+          ${columnsToAdd.join(', ')}
+        `);
+        console.log(`Added ${columnsToAdd.length} missing columns to 'order_items' table.`);
+      }
+    } catch (error: any) {
+      console.warn("Warning adding columns to order_items:", error.message);
+    }
 
     console.log("Checking for 'order_status_history' table...");
     await connection.execute(`
