@@ -5,6 +5,10 @@ import { existsSync } from "fs";
 
 export const runtime = "nodejs";
 
+// Ensure this route matches all file extensions
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ filename: string }> }
