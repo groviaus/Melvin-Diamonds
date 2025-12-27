@@ -332,7 +332,7 @@ export default function ProductDetailClient() {
                     }
                     try {
                       addItem(product, quantity, selectedSize || undefined);
-                    } catch (error) {
+                    } catch {
                       alert("Ring size is required for this product");
                     }
                   }}
@@ -361,7 +361,7 @@ export default function ProductDetailClient() {
                       // Small delay to ensure cart is updated
                       await new Promise((resolve) => setTimeout(resolve, 100));
                       router.push("/checkout");
-                    } catch (error) {
+                    } catch {
                       alert("Ring size is required for this product");
                       setIsBuyingNow(false);
                     }

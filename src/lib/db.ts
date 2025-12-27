@@ -258,7 +258,7 @@ async function createTables() {
          AND TABLE_NAME = 'order_items' 
          AND COLUMN_NAME IN ('productCategories', 'productTags', 'productDetails', 'productGalleryImages', 'productRingSizes', 'productPrice')`
       );
-      const existingColumns = columns.map((row: any) => row.COLUMN_NAME);
+      const existingColumns = columns.map((row: mysql.RowDataPacket) => row.COLUMN_NAME as string);
       
       const columnsToAdd = [];
       if (!existingColumns.includes('productCategories')) {
@@ -287,8 +287,9 @@ async function createTables() {
         `);
         console.log(`Added ${columnsToAdd.length} missing columns to 'order_items' table.`);
       }
-    } catch (error: any) {
-      console.warn("Warning adding columns to order_items:", error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.warn("Warning adding columns to order_items:", errorMessage);
     }
 
     console.log("Checking for 'order_status_history' table...");
